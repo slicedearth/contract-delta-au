@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+site/node_modules/
+site/dist/
+site/.astro/
+
+.DS_Store
+.env
+.env.*
+!.env.example

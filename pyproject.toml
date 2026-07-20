@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "contract-delta-au"
+version = "0.1.0"
+description = "Evidence-first change detection for Australian Government contract notices"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "slicedearth" }]
+dependencies = [
+  "httpx>=0.28,<1",
+  "pydantic>=2.10,<3",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3,<9",
+  "pytest-cov>=6,<7",
+  "respx>=0.22,<1",
+  "ruff>=0.9,<1",
+]
+
+[project.scripts]
+contract-delta = "contract_delta.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/contract_delta"]
+
+[tool.pytest.ini_options]
+addopts = "--strict-markers --strict-config -q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]

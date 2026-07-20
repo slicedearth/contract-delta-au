@@ -1,0 +1,272 @@
+[
+  {
+    "uri": "https://api.tenders.gov.au/ocds/findById/CN4260041",
+    "license": "https://creativecommons.org/licenses/by/3.0/au/",
+    "publisher": { "name": "Department of Finance" },
+    "releases": [
+      {
+        "id": "prod-0eb1223926e34116b9b43844c195a08b-95ba33e131a13e808a2f34a7209ea158",
+        "date": "2026-07-10T03:02:48Z",
+        "tag": ["contract"],
+        "parties": [
+          { "name": "Technology One", "roles": ["supplier"] },
+          { "name": "Department of the Senate", "roles": ["procuringEntity"] }
+        ],
+        "contracts": [
+          {
+            "id": "CN4260041",
+            "title": "CN000605 - PO002060",
+            "description": "Software as a service plus CiA Live fee",
+            "period": {
+              "startDate": "2026-06-14T14:00:00Z",
+              "endDate": "2029-06-13T14:00:00Z"
+            },
+            "value": { "currency": "AUD", "amount": "317458.84" },
+            "items": [{ "classification": { "scheme": "UNSPSC", "id": "81162000" } }]
+          }
+        ],
+        "tender": { "procurementMethod": "open", "procurementMethodDetails": "Open tender" }
+      },
+      {
+        "id": "prod-0eb1223926e34116b9b43844c195a08b-74f777d1ceb93189830a023d9cedf631",
+        "date": "2026-07-15T04:48:41Z",
+        "tag": ["contractAmendment"],
+        "parties": [
+          { "name": "Technology One", "roles": ["supplier"] },
+          { "name": "Department of the Senate", "roles": ["procuringEntity"] }
+        ],
+        "contracts": [
+          {
+            "id": "CN4260041",
+            "title": "CN000605 - PO002060",
+            "description": "Software as a service plus CiA Live fee",
+            "period": {
+              "startDate": "2026-06-14T14:00:00Z",
+              "endDate": "2029-06-13T14:00:00Z"
+            },
+            "value": { "currency": "AUD", "amount": "349204.72" },
+            "items": [{ "classification": { "scheme": "UNSPSC", "id": "81162000" } }],
+            "amendments": [
+              {
+                "id": "CN4260041-A1",
+                "releaseID": "prod-0eb1223926e34116b9b43844c195a08b-74f777d1ceb93189830a023d9cedf631",
+                "amendsReleaseID": "prod-0eb1223926e34116b9b43844c195a08b-95ba33e131a13e808a2f34a7209ea158"
+              }
+            ]
+          }
+        ],
+        "tender": { "procurementMethod": "open", "procurementMethodDetails": "Open tender" }
+      }
+    ]
+  },
+  {
+    "uri": "https://api.tenders.gov.au/ocds/findById/CN4259878",
+    "license": "https://creativecommons.org/licenses/by/3.0/au/",
+    "publisher": { "name": "Department of Finance" },
+    "releases": [
+      {
+        "id": "prod-802aa9fb8a374412939898828ba4743a-c5e85438ab3932f5b67984af17a9eb81",
+        "date": "2026-07-09T05:59:10Z",
+        "tag": ["contract"],
+        "parties": [
+          { "name": "HASKONING AUSTRALIA PTY LIMITED T/A ROYAL HASKONING", "roles": ["supplier"] },
+          { "name": "Department of Defence", "roles": ["procuringEntity"] }
+        ],
+        "contracts": [
+          {
+            "id": "CN4259878",
+            "title": "4610005299",
+            "description": "Analytical Services",
+            "period": {
+              "startDate": "2026-06-21T14:00:00Z",
+              "endDate": "2026-07-30T14:00:00Z"
+            },
+            "value": { "currency": "AUD", "amount": "134420.00" },
+            "items": [{ "classification": { "scheme": "UNSPSC", "id": "80161500" } }]
+          }
+        ],
+        "tender": { "procurementMethod": "limited", "procurementMethodDetails": "Limited tender" }
+      },
+      {
+        "id": "prod-802aa9fb8a374412939898828ba4743a-578bd08b098535cba15afa34159c3744",
+        "date": "2026-07-15T03:26:57Z",
+        "tag": ["contractAmendment"],
+        "parties": [
+          { "name": "HASKONING AUSTRALIA PTY LIMITED T/A ROYAL HASKONING", "roles": ["supplier"] },
+          { "name": "Department of Defence", "roles": ["procuringEntity"] }
+        ],
+        "contracts": [
+          {
+            "id": "CN4259878",
+            "title": "4610005299",
+            "description": "Analytical Services",
+            "period": {
+              "startDate": "2026-06-21T14:00:00Z",
+              "endDate": "2026-07-30T14:00:00Z"
+            },
+            "value": { "currency": "AUD", "amount": "95645.00" },
+            "items": [{ "classification": { "scheme": "UNSPSC", "id": "80161500" } }],
+            "amendments": [
+              {
+                "id": "CN4259878-A1",
+                "releaseID": "prod-802aa9fb8a374412939898828ba4743a-578bd08b098535cba15afa34159c3744",
+                "amendsReleaseID": "prod-802aa9fb8a374412939898828ba4743a-c5e85438ab3932f5b67984af17a9eb81"
+              }
+            ]
+          }
+        ],
+        "tender": { "procurementMethod": "limited", "procurementMethodDetails": "Limited tender" }
+      }
+    ]
+  },
+  {
+    "uri": "https://api.tenders.gov.au/ocds/findById/CN4175467",
+    "license": "https://creativecommons.org/licenses/by/3.0/au/",
+    "publisher": { "name": "Department of Finance" },
+    "releases": [
+      {
+        "id": "prod-ec6c2b76eedd4f54a3187ca0a9caf278-9af03fc92ed7373fb750cf2e5c060076",
+        "date": "2025-07-31T00:26:28Z",
+        "tag": ["contract"],
+        "parties": [
+          { "name": "Clayton Utz", "roles": ["supplier"] },
+          { "name": "Australian Bureau of Statistics", "roles": ["procuringEntity"] }
+        ],
+        "contracts": [
+          {
+            "id": "CN4175467",
+            "title": "ABS2025.157",
+            "description": "Legal Services",
+            "period": {
+              "startDate": "2025-07-29T14:00:00Z",
+              "endDate": "2027-07-30T14:00:00Z"
+            },
+            "value": { "currency": "AUD", "amount": "75000.00" },
+            "items": [{ "classification": { "scheme": "UNSPSC", "id": "80120000" } }]
+          }
+        ],
+        "tender": { "procurementMethod": "open", "procurementMethodDetails": "Open tender" }
+      },
+      {
+        "id": "prod-ec6c2b76eedd4f54a3187ca0a9caf278-74c0d87a265231d6aef024b299a0eb07",
+        "date": "2026-07-15T04:56:06Z",
+        "tag": ["contractAmendment"],
+        "parties": [
+          { "name": "Clayton Utz", "roles": ["supplier"] },
+          { "name": "Australian Bureau of Statistics", "roles": ["procuringEntity"] }
+        ],
+        "contracts": [
+          {
+            "id": "CN4175467",
+            "title": "ABS2025.157",
+            "description": "Legal Services",
+            "period": {
+              "startDate": "2025-07-29T14:00:00Z",
+              "endDate": "2027-07-30T14:00:00Z"
+            },
+            "value": { "currency": "AUD", "amount": "125000.00" },
+            "items": [{ "classification": { "scheme": "UNSPSC", "id": "80120000" } }],
+            "amendments": [
+              {
+                "id": "CN4175467-A1",
+                "releaseID": "prod-ec6c2b76eedd4f54a3187ca0a9caf278-74c0d87a265231d6aef024b299a0eb07",
+                "amendsReleaseID": "prod-ec6c2b76eedd4f54a3187ca0a9caf278-9af03fc92ed7373fb750cf2e5c060076"
+              }
+            ]
+          }
+        ],
+        "tender": { "procurementMethod": "open", "procurementMethodDetails": "Open tender" }
+      },
+      {
+        "id": "prod-ec6c2b76eedd4f54a3187ca0a9caf278-d29b58ab2d6133d99a19e270fa03a0a3",
+        "date": "2026-07-15T04:56:06Z",
+        "tag": ["contractAmendment"],
+        "parties": [
+          { "name": "Clayton Utz", "roles": ["supplier"] },
+          { "name": "Australian Bureau of Statistics", "roles": ["procuringEntity"] }
+        ],
+        "contracts": [
+          {
+            "id": "CN4175467",
+            "title": "ABS2025.157",
+            "description": "Legal Services",
+            "period": {
+              "startDate": "2025-07-29T14:00:00Z",
+              "endDate": "2027-07-30T14:00:00Z"
+            },
+            "value": { "currency": "AUD", "amount": "175000.00" },
+            "items": [{ "classification": { "scheme": "UNSPSC", "id": "80120000" } }],
+            "amendments": [
+              {
+                "id": "CN4175467-A2",
+                "releaseID": "prod-ec6c2b76eedd4f54a3187ca0a9caf278-d29b58ab2d6133d99a19e270fa03a0a3",
+                "amendsReleaseID": "prod-ec6c2b76eedd4f54a3187ca0a9caf278-9af03fc92ed7373fb750cf2e5c060076"
+              }
+            ]
+          }
+        ],
+        "tender": { "procurementMethod": "open", "procurementMethodDetails": "Open tender" }
+      }
+    ]
+  },
+  {
+    "uri": "https://api.tenders.gov.au/ocds/findById/CN4255613",
+    "license": "https://creativecommons.org/licenses/by/3.0/au/",
+    "publisher": { "name": "Department of Finance" },
+    "releases": [
+      {
+        "id": "prod-92cb8e4605464725990b1b6da445d61e-886856a9ea9536efba9e03f1d91d028f",
+        "date": "2026-06-30T00:09:16Z",
+        "tag": ["contract"],
+        "parties": [
+          { "name": "DAIRY FOOD SAFETY VICTORIA", "roles": ["supplier"] },
+          { "name": "Department of Agriculture, Fisheries and Forestry", "roles": ["procuringEntity"] }
+        ],
+        "contracts": [
+          {
+            "id": "CN4255613",
+            "title": "C17874",
+            "description": "Australian Milk Residue Analysis Survey 2026-2029",
+            "period": {
+              "startDate": "2026-06-30T14:00:00Z",
+              "endDate": "2029-06-29T14:00:00Z"
+            },
+            "value": { "currency": "AUD", "amount": "2347567.64" },
+            "items": [{ "classification": { "scheme": "UNSPSC", "id": "93131703" } }]
+          }
+        ],
+        "tender": { "procurementMethod": "limited", "procurementMethodDetails": "Limited tender" }
+      },
+      {
+        "id": "prod-92cb8e4605464725990b1b6da445d61e-5002f6e466ce3ea682fdb5d62784d7ae",
+        "date": "2026-07-15T04:43:56Z",
+        "tag": ["contractAmendment"],
+        "parties": [
+          { "name": "SAFE FOOD VICTORIA", "roles": ["supplier"] },
+          { "name": "Department of Agriculture, Fisheries and Forestry", "roles": ["procuringEntity"] }
+        ],
+        "contracts": [
+          {
+            "id": "CN4255613",
+            "title": "C17874",
+            "description": "Australian Milk Residue Analysis Survey 2026-2029",
+            "period": {
+              "startDate": "2026-06-30T14:00:00Z",
+              "endDate": "2029-06-29T14:00:00Z"
+            },
+            "value": { "currency": "AUD", "amount": "2347567.64" },
+            "items": [{ "classification": { "scheme": "UNSPSC", "id": "93131703" } }],
+            "amendments": [
+              {
+                "id": "CN4255613-A1",
+                "releaseID": "prod-92cb8e4605464725990b1b6da445d61e-5002f6e466ce3ea682fdb5d62784d7ae",
+                "amendsReleaseID": "prod-92cb8e4605464725990b1b6da445d61e-886856a9ea9536efba9e03f1d91d028f"
+              }
+            ]
+          }
+        ],
+        "tender": { "procurementMethod": "limited", "procurementMethodDetails": "Limited tender" }
+      }
+    ]
+  }
+]
