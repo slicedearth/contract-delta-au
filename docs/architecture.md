@@ -16,9 +16,10 @@ always-running service.
 5. `build_site_data` creates compact dashboard JSON, per-contract evidence JSON, and a CSV
    event export.
 6. Astro renders static pages from temporary generated assets. The change feed is divided into
-   50-event static pages with prefetched client-side navigation, sticky controls, page-local
-   filtering, and CSV export of already-public data. Every event remains reachable without an
-   always-running server or a full document reload between result pages.
+   50-event static pages with prefetched client-side navigation and sticky controls. Filters
+   load the already-public event export on demand, search the full dataset, paginate matching
+   results in groups of 50, and export the complete filtered set. Every event remains reachable
+   without an always-running server or a full document reload between result pages.
 7. The scheduled update validates every published source path, availability-checks a bounded
    recent sample, and fails on definite missing-record responses.
 8. The historical workflow processes limited date windows and records an atomic checkpoint

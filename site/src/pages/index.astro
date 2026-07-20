@@ -59,6 +59,7 @@ const firstPageEvents = getChangePage(dashboard.events, 1);
 
   <ChangeFeed
     events={firstPageEvents}
+    filterEvents={dashboard.events}
     totalEvents={dashboard.events.length}
     currentPage={1}
     totalPages={totalChangePages}

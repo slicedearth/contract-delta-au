@@ -5,19 +5,26 @@ import type { ChangeEvent } from "../types";
 
 interface Props {
   events: ChangeEvent[];
+  filterEvents: ChangeEvent[];
   totalEvents: number;
   currentPage: number;
   totalPages: number;
 }
 
-const { events, totalEvents, currentPage, totalPages } = Astro.props;
+const { events, filterEvents, totalEvents, currentPage, totalPages } = Astro.props;
 const base = import.meta.env.BASE_URL;
-const agencies = [...new Set(events.map((event) => event.agency_name).filter(Boolean))].sort();
-const fields = [...new Set(events.map((event) => event.field_name))].sort();
-const fieldLabels = new Map(events.map((event) => [event.field_name, event.field_label]));
+const agencies = [...new Set(filterEvents.map((event) => event.agency_name).filter(Boolean))].sort();
+const fields = [...new Set(filterEvents.map((event) => event.field_name))].sort();
+const fieldLabels = new Map(filterEvents.map((event) => [event.field_name, event.field_label]));
 ---
 
-<section class="content-section changes-section" id="changes" data-current-page={currentPage}>
+<section
+  class="content-section changes-section"
+  id="changes"
+  data-current-page={currentPage}
+  data-base={base}
+  data-events-url={`${base}data/change-events.json`}
+>
   <div class="section-heading">
     <div>
       <p class="eyebrow"><span></span> Change feed</p>
@@ -30,7 +37,7 @@ const fieldLabels = new Map(events.map((event) => [event.field_name, event.field
     <a class="download-link" href={`${base}data/change-events.csv`} download>Download published CSV ↓</a>
   </div>
 
-  <form class="filters" data-filters aria-label="Filter contract changes on this page">
+  <form class="filters" data-filters aria-label="Filter all published contract changes">
     <label class="search-field">
       <span>Search</span>
       <div>
@@ -67,13 +74,14 @@ const fieldLabels = new Map(events.map((event) => [event.field_name, event.field
   </form>
 
   <div class="result-line">
-    <p aria-live="polite">
-      <strong data-result-count>{events.length}</strong> matching changes on page {currentPage} of
-      {` ${totalPages}`}. {totalEvents} published events in total
+    <p aria-live="polite" data-result-summary>
+      <strong data-result-count>{events.length}</strong><span data-result-detail>{` matching changes on page ${currentPage} of ${totalPages}. ${totalEvents} published events in total`}</span>
     </p>
-    <button class="text-button" type="button" data-download-filtered>Download filtered page CSV</button>
+    <button class="text-button" type="button" data-download-filtered>Download filtered CSV</button>
   </div>
-  <p class="page-filter-note">Filters and the filtered CSV apply to this page.</p>
+  <p class="page-filter-note" data-filter-note>
+    Filters and the filtered CSV cover all published events. Results are shown 50 per page.
+  </p>
 
   <ChangePagination currentPage={currentPage} totalPages={totalPages} position="top" />
 
@@ -90,87 +98,7 @@ const fieldLabels = new Map(events.map((event) => [event.field_name, event.field
 </section>
 
 <script>
-  let paginationNavigationPending = false;
-
-  document.addEventListener("astro:before-preparation", (event) => {
-    paginationNavigationPending = Boolean(event.sourceElement?.closest(".change-pagination"));
-  });
-
-  document.addEventListener("astro:after-swap", () => {
-    if (!paginationNavigationPending) return;
-
-    const target = document.getElementById("change-results");
-    if (target) {
-      const scrollBehaviour = document.documentElement.style.scrollBehavior;
-      document.documentElement.style.scrollBehavior = "auto";
-      const stickyOffset = Number.parseFloat(window.getComputedStyle(target).top) || 0;
-      const targetTop = window.scrollY + target.getBoundingClientRect().top - stickyOffset;
-      window.scrollTo({ top: targetTop, left: 0 });
-      document.documentElement.style.scrollBehavior = scrollBehaviour;
-    }
-
-    paginationNavigationPending = false;
-  });
-
-  const setupChangeFeed = () => {
-    const feed = document.querySelector<HTMLElement>("[data-current-page]");
-    if (!feed) return;
-
-    const form = feed.querySelector<HTMLFormElement>("[data-filters]");
-    const cards = Array.from(feed.querySelectorAll<HTMLElement>("[data-event]"));
-    const count = feed.querySelector<HTMLElement>("[data-result-count]");
-    const empty = feed.querySelector<HTMLElement>("[data-empty]");
-    const download = feed.querySelector<HTMLButtonElement>("[data-download-filtered]");
-
-    const applyFilters = () => {
-      if (!form) return;
-      const values = new FormData(form);
-      const query = String(values.get("query") ?? "").trim().toLocaleLowerCase("en-AU");
-      const agency = String(values.get("agency") ?? "");
-      const field = String(values.get("field") ?? "");
-      const direction = String(values.get("direction") ?? "");
-      let visible = 0;
-
-      cards.forEach((card) => {
-        const matches =
-          (!query || (card.dataset.search ?? "").includes(query)) &&
-          (!agency || card.dataset.agency === agency) &&
-          (!field || card.dataset.field === field) &&
-          (!direction || card.dataset.direction === direction);
-        card.hidden = !matches;
-        if (matches) visible += 1;
-      });
-
-      if (count) count.textContent = String(visible);
-      if (empty) empty.hidden = visible !== 0;
-      if (download) download.disabled = visible === 0;
-    };
-
-    form?.addEventListener("input", applyFilters);
-    form?.addEventListener("reset", () => window.setTimeout(applyFilters));
-
-    download?.addEventListener("click", () => {
-      const visible = cards.filter((card) => !card.hidden).map((card) => ({
-        contract_id: card.querySelector(".change-card__identity a")?.textContent?.trim() ?? "",
-        agency: card.dataset.agency ?? "",
-        field: card.dataset.field ?? "",
-        direction: card.dataset.direction ?? "",
-        summary: card.querySelector(".change-summary")?.textContent?.trim() ?? ""
-      }));
-      const neutralise = (value: string) => /^[=+\-@\t\r\n]/.test(value) ? `'${value}` : value;
-      const escape = (value: string) => `"${neutralise(value).replaceAll('"', '""')}"`;
-      const rows = ["contract_id,agency,field,direction,summary", ...visible.map((row) =>
-        [row.contract_id, row.agency, row.field, row.direction, row.summary].map(escape).join(",")
-      )];
-      const blob = new Blob([`${rows.join("\n")}\n`], { type: "text/csv;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = `contractdelta-changes-page-${feed.dataset.currentPage ?? "1"}.csv`;
-      anchor.click();
-      URL.revokeObjectURL(url);
-    });
-  };
+  import { setupChangeFeed } from "../lib/change-feed-client";
 
   document.addEventListener("astro:page-load", setupChangeFeed);
 </script>

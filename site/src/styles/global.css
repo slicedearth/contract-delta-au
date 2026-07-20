@@ -589,6 +589,11 @@ select {
   font-size: 0.72rem;
 }
 
+.page-filter-note.is-error {
+  color: #922f23;
+  font-weight: 700;
+}
+
 .change-pagination {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;

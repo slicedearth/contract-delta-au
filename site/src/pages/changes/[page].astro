@@ -33,13 +33,14 @@ const pageEvents = getChangePage(dashboard.events, page);
     <p class="eyebrow eyebrow--light"><span></span> Change feed</p>
     <h1>Published changes,<br /><em>page {page}.</em></h1>
     <p>
-      Browse every published change event across {totalPages} static pages. Filters operate on
-      the current page, while the complete CSV remains available for dataset-wide analysis.
+      Browse every published change event across {totalPages} static pages. Filters search the
+      full published dataset and paginate matching results in groups of 50.
     </p>
   </header>
 
   <ChangeFeed
     events={pageEvents}
+    filterEvents={dashboard.events}
     totalEvents={dashboard.events.length}
     currentPage={page}
     totalPages={totalPages}

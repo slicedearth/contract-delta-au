@@ -65,7 +65,8 @@ public repository retains source code, privacy-minimised fixtures, and non-ident
 counts. Production dashboard data and downloads are generated inside the deployment runner
 and are never committed to public Git history. The change feed uses 50-event static pages with
 prefetched client-side navigation and sticky controls, so every published event remains
-browsable without making any one page grow without bound.
+browsable without making any one page grow without bound. Filters load the published event
+export on demand, search the full dataset, and paginate matching results in the browser.
 
 ## Local development
 

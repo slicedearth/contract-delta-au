@@ -72,6 +72,7 @@ def test_pipeline_builds_idempotent_evidence_assets(
     public_events = json.loads(
         (tmp_path / "site/public/data/change-events.json").read_text(encoding="utf-8")
     )
+    assert len(public_events) == dashboard["stats"]["change_events"]
     assert public_events[0]["source_publisher"] == "Australian Government Department of Finance"
     assert public_events[0]["source_license"].endswith("/by/3.0/au/")
     assert public_events[0]["adaptation_notice"].startswith("Adapted and normalised")
