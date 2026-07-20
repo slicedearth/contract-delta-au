@@ -73,6 +73,7 @@ Run the checks:
 ```bash
 .venv/bin/ruff check .
 .venv/bin/pytest --cov=contract_delta --cov-report=term-missing
+.venv/bin/contract-delta check-source-links
 cd site && npm run check && npm run build
 ```
 
@@ -84,6 +85,9 @@ Fetch a live latest-modified window:
 
 Date ranges are capped at 31 days, pagination is capped at 250 pages by default, transient
 source failures are retried, and publication stops if validation failures exceed 2%.
+The weekly update checks every distinct published source destination. Definite `404` and `410`
+responses fail the run, while access controls, rate limits, server errors, and network failures
+are reported as indeterminate for manual review.
 
 ## Repository layout
 

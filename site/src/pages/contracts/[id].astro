@@ -105,8 +105,8 @@ const description = `${contract.amendment_count} amendments and ${contract.event
                     </div>
                   )}
                   <div class="timeline__record-links">
-                    <a class="text-link" href={version.official_record_url}>Official record ↗</a>
-                    <a class="text-link muted-link" href={version.source_url}>OCDS JSON ↗</a>
+                    <a class="text-link" href={version.official_record_url} rel="noreferrer">Official record ↗</a>
+                    <a class="text-link muted-link" href={version.source_url} rel="noreferrer">OCDS JSON ↗</a>
                   </div>
                   <details class="evidence-details">
                     <summary>Evidence identifiers</summary>
@@ -138,8 +138,8 @@ const description = `${contract.amendment_count} amendments and ${contract.event
           <span aria-hidden="true">⌁</span>
           <h2>Inspect the evidence</h2>
           <p>Compare the official notice with the source JSON and ContractDelta evidence bundle.</p>
-          <a class="button button--primary" href={contract.official_record_url}>Open official record ↗</a>
-          <a class="button button--ghost-dark" href={contract.source_url}>Open OCDS JSON ↗</a>
+          <a class="button button--primary" href={contract.official_record_url} rel="noreferrer">Open official record ↗</a>
+          <a class="button button--ghost-dark" href={contract.source_url} rel="noreferrer">Open OCDS JSON ↗</a>
           <a class="button button--ghost-dark" href={`${base}${contract.evidence_path}`} download>Download evidence JSON ↓</a>
         </section>
         <section class="sidebar-note">

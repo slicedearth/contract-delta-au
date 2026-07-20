@@ -25,6 +25,12 @@ bounded dates, pages, timeouts, and retries.
 Source text is rendered through Astro's escaping boundary. CSV text that could be interpreted
 as a spreadsheet formula is prefixed safely, while the JSON evidence retains the exact
 normalised value. The site also applies a restrictive content policy and referrer policy.
+Every cross-origin link explicitly suppresses referrer information.
+
+The scheduled updater checks all distinct generated source destinations without following
+redirects or downloading response bodies. Definite missing-record responses stop the update.
+Access controls, rate limits, server errors, and network failures are reported as indeterminate
+so temporary source-side blocking does not masquerade as a broken record.
 
 Workflow actions are pinned to immutable release commits. Dependabot monitors the workflow,
 Python, and npm ecosystems, while CI runs Python and npm vulnerability audits.

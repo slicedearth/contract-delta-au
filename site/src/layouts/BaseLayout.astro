@@ -54,6 +54,7 @@ const imageUrl = new URL(`${base}${image}`, Astro.site);
         <a
           class="nav-source"
           href="https://www.data.gov.au/data/dataset/historical-australian-government-contract-data"
+          rel="noreferrer"
         >Source ↗</a>
       </nav>
     </header>
@@ -71,12 +72,12 @@ const imageUrl = new URL(`${base}${image}`, Astro.site);
       <div class="footer-links">
         <a href={`${base}methodology/`}>Methodology & limitations</a>
         <a href={`${base}data/`}>Downloads & attribution</a>
-        <a href="https://github.com/slicedearth/contract-delta-au">Source code ↗</a>
+        <a href="https://github.com/slicedearth/contract-delta-au" rel="noreferrer">Source code ↗</a>
       </div>
       <p class="fine-print">
         Not affiliated with or endorsed by the Australian Government. Adapted AusTender data is
         attributed to the Department of Finance under
-        <a href="https://creativecommons.org/licenses/by/3.0/au/">CC BY 3.0 AU</a>.
+        <a href="https://creativecommons.org/licenses/by/3.0/au/" rel="noreferrer">CC BY 3.0 AU</a>.
       </p>
     </footer>
   </body>

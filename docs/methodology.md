@@ -65,6 +65,12 @@ Published events distinguish the human-readable official Contract Notice from th
 machine-readable OCDS JSON source. When the source does not expose a valid page identifier,
 the official-record link falls back to an AusTender search for the parent CN ID.
 
+The weekly update checks every distinct published official-record and OCDS JSON destination.
+Destinations outside the validated source paths fail before any request. For source responses,
+only a definite `404` or `410` is treated as broken. Redirects, access controls, rate limits,
+server errors, and network failures are recorded as indeterminate because they do not prove
+that a public record is missing.
+
 CSV exports neutralise text that spreadsheet applications could otherwise interpret as a
 formula. JSON evidence preserves the exact normalised text.
 

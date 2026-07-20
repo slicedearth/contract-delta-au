@@ -16,6 +16,8 @@ always-running service.
    event export.
 6. Astro renders static pages. Browser JavaScript is limited to filtering and client-side CSV
    export of already-public data.
+7. The scheduled update checks bounded, validated source destinations and fails on definite
+   missing-record responses.
 
 ## Trust boundaries
 
@@ -23,6 +25,7 @@ always-running service.
 - Pagination URLs must use HTTPS, the `api.tenders.gov.au` host, and the expected path.
 - Date ranges, pagination, retries, and timeouts are bounded.
 - Source records are never rendered directly as HTML.
+- Published cross-origin links suppress referrer information.
 - Deployment contains no secrets and no server runtime.
 
 ## State and evidence

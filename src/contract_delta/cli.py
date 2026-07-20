@@ -10,6 +10,7 @@ from typing import Any
 
 from contract_delta.client import AusTenderClient
 from contract_delta.pipeline import process_releases, rebuild_site
+from contract_delta.source_links import SourceLinkError, check_dashboard_source_links
 
 
 def _date(value: str) -> date:
@@ -78,6 +79,10 @@ def build_parser() -> argparse.ArgumentParser:
     fixture.add_argument("path", type=Path)
 
     subparsers.add_parser("rebuild-site", help="rebuild site assets from local state")
+    subparsers.add_parser(
+        "check-source-links",
+        help="check generated official-record and OCDS JSON destinations",
+    )
     return parser
 
 
@@ -88,6 +93,21 @@ def main(argv: list[str] | None = None) -> int:
         dashboard = rebuild_site(root)
         print(json.dumps(dashboard["stats"], default=str, sort_keys=True))
         return 0
+    if args.command == "check-source-links":
+        try:
+            report = check_dashboard_source_links(root / "site/src/data/dashboard.json")
+        except SourceLinkError as exc:
+            print(f"source link check failed: {exc}")
+            return 1
+        for result in report.results:
+            status = str(result.status_code) if result.status_code is not None else result.detail
+            print(f"{result.outcome.upper():13} {status or '-':18} {result.url}")
+        print(
+            "source link check: "
+            f"{report.reachable} reachable, {report.broken} broken, "
+            f"{report.indeterminate} indeterminate"
+        )
+        return 1 if report.broken else 0
 
     if args.command == "ingest-fixture":
         releases, urls, license_url, publisher = _read_fixture(args.path)
