@@ -23,6 +23,11 @@
   box-sizing: border-box;
 }
 
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 5rem;

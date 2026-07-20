@@ -90,6 +90,28 @@ const fieldLabels = new Map(events.map((event) => [event.field_name, event.field
 </section>
 
 <script>
+  let paginationNavigationPending = false;
+
+  document.addEventListener("astro:before-preparation", (event) => {
+    paginationNavigationPending = Boolean(event.sourceElement?.closest(".change-pagination"));
+  });
+
+  document.addEventListener("astro:after-swap", () => {
+    if (!paginationNavigationPending) return;
+
+    const target = document.getElementById("change-results");
+    if (target) {
+      const scrollBehaviour = document.documentElement.style.scrollBehavior;
+      document.documentElement.style.scrollBehavior = "auto";
+      const stickyOffset = Number.parseFloat(window.getComputedStyle(target).top) || 0;
+      const targetTop = window.scrollY + target.getBoundingClientRect().top - stickyOffset;
+      window.scrollTo({ top: targetTop, left: 0 });
+      document.documentElement.style.scrollBehavior = scrollBehaviour;
+    }
+
+    paginationNavigationPending = false;
+  });
+
   const setupChangeFeed = () => {
     const feed = document.querySelector<HTMLElement>("[data-current-page]");
     if (!feed) return;

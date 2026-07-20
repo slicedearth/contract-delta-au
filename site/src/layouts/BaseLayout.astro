@@ -42,7 +42,7 @@ const imageUrl = new URL(`${base}${image}`, Astro.site);
     <title>{title}</title>
     <ClientRouter fallback="swap" />
   </head>
-  <body>
+  <body transition:animate="none">
     <a class="skip-link" href="#main-content">Skip to content</a>
     <header class="site-header">
       <a class="brand" href={base} aria-label="ContractDelta AU home">
