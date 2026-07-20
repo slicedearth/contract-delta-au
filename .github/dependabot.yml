@@ -18,6 +18,10 @@ updates:
       time: "18:00"
       timezone: Australia/Melbourne
     open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: typescript
+        update-types:
+          - version-update:semver-major
 
   - package-ecosystem: github-actions
     directory: /

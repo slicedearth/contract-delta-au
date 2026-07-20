@@ -15,7 +15,9 @@ runtimes and build tooling. Weekly Dependabot checks cover Python, npm, and GitH
 ## Compatibility constraints
 
 - TypeScript 6.0.3 is retained because the current stable `@astrojs/check` peer range supports
-  TypeScript 5 and 6, but not TypeScript 7.
+  TypeScript 5 and 6, but not TypeScript 7. Dependabot ignores TypeScript major-version
+  updates until the checker declares support for the next major; minor and patch updates
+  remain enabled.
 - Python and npm dependencies use upper major-version bounds where a future breaking release
   should be reviewed before adoption.
 - npm install scripts are denied by default. The versioned `esbuild` installer required by
