@@ -1,0 +1,29 @@
+version: 2
+
+updates:
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "18:00"
+      timezone: Australia/Melbourne
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: npm
+    directory: /site
+    schedule:
+      interval: weekly
+      day: monday
+      time: "18:00"
+      timezone: Australia/Melbourne
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "18:00"
+      timezone: Australia/Melbourne
+    open-pull-requests-limit: 5

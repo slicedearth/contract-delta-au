@@ -14,16 +14,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
-          python-version: "3.12"
+          python-version: "3.14"
           cache: pip
 
       - name: Install Python dependencies
-        run: pip install -e '.[dev]'
+        run: |
+          python -m pip install --upgrade pip==26.1.2
+          python -m pip install -e '.[dev]'
 
       - name: Lint Python
         run: ruff check .
@@ -31,12 +33,18 @@ jobs:
       - name: Test Python
         run: pytest --cov=contract_delta --cov-report=term-missing --cov-fail-under=75
 
+      - name: Audit Python dependencies
+        run: pip-audit --skip-editable
+
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "24"
           cache: npm
           cache-dependency-path: site/package-lock.json
+
+      - name: Set up npm
+        run: npm install --global npm@12.0.1
 
       - name: Install site dependencies
         working-directory: site
@@ -45,6 +53,10 @@ jobs:
       - name: Check site
         working-directory: site
         run: npm run check
+
+      - name: Audit site dependencies
+        working-directory: site
+        run: npm audit --audit-level=high
 
       - name: Build site
         working-directory: site
