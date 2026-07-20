@@ -1,0 +1,110 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import rawDashboard from "../data/dashboard.json";
+import type { Dashboard } from "../types";
+import { formatDate, formatMoney } from "../lib/format";
+
+const dashboard = rawDashboard as Dashboard;
+const base = import.meta.env.BASE_URL;
+---
+
+<BaseLayout
+  title="Data and downloads — ContractDelta AU"
+  description="Download ContractDelta change events and inspect agency and supplier summaries."
+>
+  <header class="page-hero">
+    <p class="eyebrow eyebrow--light"><span></span> Open data</p>
+    <h1>Review the facts.<br /><em>Take the evidence.</em></h1>
+    <p>
+      Compact, privacy-minimised outputs with source attribution. Use the CSV for analysis or
+      the JSON for release-level provenance.
+    </p>
+  </header>
+
+  <section class="download-band">
+    <div>
+      <span>01</span>
+      <h2>Change events CSV</h2>
+      <p>One row per changed field, with before and after values and the primary record URL.</p>
+      <a class="button button--primary" href={`${base}data/change-events.csv`} download>Download CSV ↓</a>
+    </div>
+    <div>
+      <span>02</span>
+      <h2>Change events JSON</h2>
+      <p>Structured events with release IDs, evidence hashes, calculations, and plain language.</p>
+      <a class="button button--primary" href={`${base}data/change-events.json`} download>Download JSON ↓</a>
+    </div>
+    <div>
+      <span>03</span>
+      <h2>Per-contract evidence</h2>
+      <p>Each contract timeline provides a dedicated JSON bundle alongside its primary source.</p>
+      <a class="button button--ghost-dark" href={`${base}#changes`}>Browse contracts →</a>
+    </div>
+  </section>
+
+  <section class="content-section data-summary-section">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow"><span></span> Dataset status</p>
+        <h2>What is currently published</h2>
+      </div>
+      <p class="updated-stamp">Source current to<br /><strong>{formatDate(dashboard.latest_source_modified_at, true)}</strong></p>
+    </div>
+    <div class="data-stat-grid">
+      <div><span>Changed contracts</span><strong>{dashboard.stats.changed_contracts}</strong></div>
+      <div><span>Amendments tracked</span><strong>{dashboard.stats.amendments_tracked}</strong></div>
+      <div><span>Field events</span><strong>{dashboard.stats.change_events}</strong></div>
+      <div><span>Current reported value</span><strong>{formatMoney(dashboard.stats.current_reported_value)}</strong></div>
+    </div>
+  </section>
+
+  <section class="summary-tables">
+    <section>
+      <div class="table-heading">
+        <div><p class="eyebrow"><span></span> By agency</p><h2>Amendment activity</h2></div>
+        <span>Neutral counts</span>
+      </div>
+      <div class="responsive-table">
+        <table>
+          <thead><tr><th>Agency</th><th>Changed contracts</th><th>Events</th><th>Reported value</th></tr></thead>
+          <tbody>
+            {dashboard.agencies.map((agency) => (
+              <tr><th scope="row">{agency.name}</th><td>{agency.contracts}</td><td>{agency.events}</td><td>{formatMoney(agency.reported_value)}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section>
+      <div class="table-heading">
+        <div><p class="eyebrow"><span></span> By supplier</p><h2>Source appearances</h2></div>
+        <span>Neutral counts</span>
+      </div>
+      <div class="responsive-table">
+        <table>
+          <thead><tr><th>Supplier</th><th>Changed contracts</th><th>Events</th><th>Reported value</th></tr></thead>
+          <tbody>
+            {dashboard.suppliers.map((supplier) => (
+              <tr><th scope="row">{supplier.name}</th><td>{supplier.contracts}</td><td>{supplier.events}</td><td>{formatMoney(supplier.reported_value)}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+
+  <section class="attribution-panel">
+    <div><span aria-hidden="true">§</span><h2>Source and licence</h2></div>
+    <div>
+      <p>
+        AusTender Contract Notice data is attributed to the Australian Government Department
+        of Finance and used under the Creative Commons Attribution 3.0 Australia licence.
+      </p>
+      <p>
+        ContractDelta is independent and does not republish contacts, email addresses, ABNs,
+        or street addresses.
+      </p>
+      <a class="text-link" href={dashboard.source.license}>Read the data licence ↗</a>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,228 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ChangeCard from "../components/ChangeCard.astro";
+import rawDashboard from "../data/dashboard.json";
+import type { Dashboard } from "../types";
+import { formatDate, formatMoney } from "../lib/format";
+
+const dashboard = rawDashboard as Dashboard;
+const base = import.meta.env.BASE_URL;
+const agencies = [...new Set(dashboard.events.map((event) => event.agency_name).filter(Boolean))].sort();
+const fields = [...new Set(dashboard.events.map((event) => event.field_name))].sort();
+const fieldLabels = new Map(dashboard.events.map((event) => [event.field_name, event.field_label]));
+---
+
+<BaseLayout>
+  <section class="hero">
+    <div class="hero__copy">
+      <p class="eyebrow"><span></span> Public records, change-tracked</p>
+      <h1>See the contract.<br /><em>See the change.</em></h1>
+      <p class="hero__lede">
+        ContractDelta makes amendments to Australian Government contracts visible,
+        verifiable, and easier to investigate—without making claims the data cannot support.
+      </p>
+      <div class="hero__actions">
+        <a class="button button--primary" href="#changes">Explore recent changes ↓</a>
+        <a class="button button--ghost" href={`${base}methodology/`}>How it works</a>
+      </div>
+    </div>
+    <div class="hero__signal" aria-label="Current dataset summary">
+      <div class="signal-grid" aria-hidden="true"></div>
+      <div class="signal-stamp">LIVE DATASET</div>
+      <p>Current reported value across change-tracked notices</p>
+      <strong>{formatMoney(dashboard.stats.current_reported_value)}</strong>
+      <div class="signal-delta">
+        <span>Δ</span>
+        <div>
+          <b>{dashboard.stats.change_events}</b>
+          <small>field changes preserved</small>
+        </div>
+      </div>
+      <div class="signal-meta">
+        <span>Latest source record</span>
+        <time datetime={dashboard.latest_source_modified_at ?? undefined}>
+          {formatDate(dashboard.latest_source_modified_at, true)}
+        </time>
+      </div>
+    </div>
+  </section>
+
+  <section class="metric-strip" aria-label="Dataset metrics">
+    <div><strong>{dashboard.stats.changed_contracts}</strong><span>Changed contracts</span></div>
+    <div><strong>{dashboard.stats.amendments_tracked}</strong><span>Amendments tracked</span></div>
+    <div><strong>{dashboard.stats.change_events}</strong><span>Field-level events</span></div>
+    <div class="metric-strip__source">
+      <span class="status-dot"></span>
+      <span>Source: AusTender OCDS</span>
+    </div>
+  </section>
+
+  <section class="content-section changes-section" id="changes">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow"><span></span> Change feed</p>
+        <h2>What changed?</h2>
+        <p>Every comparison links back to the source releases that support it.</p>
+      </div>
+      <a class="download-link" href={`${base}data/change-events.csv`} download>Download all CSV ↓</a>
+    </div>
+
+    <form class="filters" data-filters aria-label="Filter contract changes">
+      <label class="search-field">
+        <span>Search</span>
+        <div>
+          <span aria-hidden="true">⌕</span>
+          <input type="search" name="query" placeholder="Contract, agency, supplier…" autocomplete="off" />
+        </div>
+      </label>
+      <label>
+        <span>Agency</span>
+        <select name="agency">
+          <option value="">All agencies</option>
+          {agencies.map((agency) => <option value={agency}>{agency}</option>)}
+        </select>
+      </label>
+      <label>
+        <span>Field</span>
+        <select name="field">
+          <option value="">All fields</option>
+          {fields.map((field) => <option value={field}>{fieldLabels.get(field)}</option>)}
+        </select>
+      </label>
+      <label>
+        <span>Direction</span>
+        <select name="direction">
+          <option value="">Any direction</option>
+          <option value="increase">Increase</option>
+          <option value="decrease">Decrease</option>
+          <option value="extension">Extension</option>
+          <option value="reduction">Reduction</option>
+          <option value="changed">Other change</option>
+        </select>
+      </label>
+      <button class="reset-button" type="reset">Clear</button>
+    </form>
+
+    <div class="result-line">
+      <p aria-live="polite"><strong data-result-count>{dashboard.events.length}</strong> evidence-linked changes</p>
+      <button class="text-button" type="button" data-download-filtered>Download filtered CSV</button>
+    </div>
+
+    <div class="change-grid" data-change-grid>
+      {dashboard.events.map((event) => <ChangeCard event={event} />)}
+    </div>
+    <div class="empty-state" data-empty hidden>
+      <span aria-hidden="true">∅</span>
+      <h3>No changes match those filters</h3>
+      <p>Try a broader search or clear the filters.</p>
+    </div>
+  </section>
+
+  <section class="profiles-section">
+    <div class="section-heading compact-heading">
+      <div>
+        <p class="eyebrow eyebrow--light"><span></span> Profiles</p>
+        <h2>Follow the pattern,<br />not just the headline.</h2>
+      </div>
+      <p>
+        Compare amendment activity by agency and supplier. Counts describe source records,
+        not performance or conduct.
+      </p>
+    </div>
+    <div class="profile-columns">
+      <section aria-labelledby="agency-heading">
+        <div class="profile-title"><h3 id="agency-heading">Agencies</h3><span>Events</span></div>
+        <ol>
+          {dashboard.agencies.slice(0, 4).map((agency, index) => (
+            <li>
+              <span class="rank">{String(index + 1).padStart(2, "0")}</span>
+              <div><strong>{agency.name}</strong><small>{agency.contracts} changed {agency.contracts === 1 ? "contract" : "contracts"}</small></div>
+              <b>{agency.events}</b>
+            </li>
+          ))}
+        </ol>
+      </section>
+      <section aria-labelledby="supplier-heading">
+        <div class="profile-title"><h3 id="supplier-heading">Suppliers</h3><span>Events</span></div>
+        <ol>
+          {dashboard.suppliers.slice(0, 4).map((supplier, index) => (
+            <li>
+              <span class="rank">{String(index + 1).padStart(2, "0")}</span>
+              <div><strong>{supplier.name}</strong><small>{formatMoney(supplier.reported_value)} current reported value</small></div>
+              <b>{supplier.events}</b>
+            </li>
+          ))}
+        </ol>
+      </section>
+    </div>
+    <a class="button button--light" href={`${base}data/`}>Explore data summaries →</a>
+  </section>
+
+  <section class="responsibility-callout">
+    <span class="callout-mark" aria-hidden="true">!</span>
+    <div>
+      <p class="eyebrow"><span></span> Read changes responsibly</p>
+      <h2>A change is a lead.<br />It is not a verdict.</h2>
+    </div>
+    <div>
+      <p>{dashboard.disclaimer}</p>
+      <a class="text-link" href={`${base}methodology/`}>Read the methodology and limitations →</a>
+    </div>
+  </section>
+
+  <script>
+    const form = document.querySelector<HTMLFormElement>("[data-filters]");
+    const cards = Array.from(document.querySelectorAll<HTMLElement>("[data-event]"));
+    const count = document.querySelector<HTMLElement>("[data-result-count]");
+    const empty = document.querySelector<HTMLElement>("[data-empty]");
+    const download = document.querySelector<HTMLButtonElement>("[data-download-filtered]");
+
+    const applyFilters = () => {
+      if (!form) return;
+      const values = new FormData(form);
+      const query = String(values.get("query") ?? "").trim().toLocaleLowerCase("en-AU");
+      const agency = String(values.get("agency") ?? "");
+      const field = String(values.get("field") ?? "");
+      const direction = String(values.get("direction") ?? "");
+      let visible = 0;
+
+      cards.forEach((card) => {
+        const matches =
+          (!query || (card.dataset.search ?? "").includes(query)) &&
+          (!agency || card.dataset.agency === agency) &&
+          (!field || card.dataset.field === field) &&
+          (!direction || card.dataset.direction === direction);
+        card.hidden = !matches;
+        if (matches) visible += 1;
+      });
+
+      if (count) count.textContent = String(visible);
+      if (empty) empty.hidden = visible !== 0;
+      if (download) download.disabled = visible === 0;
+    };
+
+    form?.addEventListener("input", applyFilters);
+    form?.addEventListener("reset", () => window.setTimeout(applyFilters));
+
+    download?.addEventListener("click", () => {
+      const visible = cards.filter((card) => !card.hidden).map((card) => ({
+        contract_id: card.querySelector(".change-card__identity a")?.textContent?.trim() ?? "",
+        agency: card.dataset.agency ?? "",
+        field: card.dataset.field ?? "",
+        direction: card.dataset.direction ?? "",
+        summary: card.querySelector(".change-summary")?.textContent?.trim() ?? ""
+      }));
+      const escape = (value: string) => `"${value.replaceAll('"', '""')}"`;
+      const rows = ["contract_id,agency,field,direction,summary", ...visible.map((row) =>
+        [row.contract_id, row.agency, row.field, row.direction, row.summary].map(escape).join(",")
+      )];
+      const blob = new Blob([`${rows.join("\n")}\n`], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = "contractdelta-filtered-changes.csv";
+      anchor.click();
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</BaseLayout>

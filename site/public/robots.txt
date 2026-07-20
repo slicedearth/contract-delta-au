@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://slicedearth.github.io/contract-delta-au/sitemap-index.xml

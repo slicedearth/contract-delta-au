@@ -309,7 +309,12 @@ def build_site_data(
             "duration_change_days",
             "source_url",
         ]
-        writer = csv.DictWriter(handle, fieldnames=fieldnames, extrasaction="ignore")
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=fieldnames,
+            extrasaction="ignore",
+            lineterminator="\n",
+        )
         writer.writeheader()
         writer.writerows(site_events)
     return dashboard

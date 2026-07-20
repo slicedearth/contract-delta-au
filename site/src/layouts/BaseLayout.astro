@@ -1,0 +1,74 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+}
+
+const {
+  title = "ContractDelta AU — Version control for government contracts",
+  description = "Evidence-linked changes to Australian Government Contract Notices.",
+  image = "social-card.svg"
+} = Astro.props;
+const base = import.meta.env.BASE_URL;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const imageUrl = new URL(`${base}${image}`, Astro.site);
+---
+
+<!doctype html>
+<html lang="en-AU">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#102725" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={imageUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header">
+      <a class="brand" href={base} aria-label="ContractDelta AU home">
+        <span class="brand-mark" aria-hidden="true">Δ</span>
+        <span>ContractDelta <b>AU</b></span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href={`${base}#changes`}>Changes</a>
+        <a href={`${base}data/`}>Data</a>
+        <a href={`${base}methodology/`}>Methodology</a>
+        <a class="nav-source" href="https://api.tenders.gov.au/ocds/">Source ↗</a>
+      </nav>
+    </header>
+    <main id="main-content">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div>
+        <a class="brand footer-brand" href={base}>
+          <span class="brand-mark" aria-hidden="true">Δ</span>
+          <span>ContractDelta AU</span>
+        </a>
+        <p>Independent, evidence-first analysis of public procurement records.</p>
+      </div>
+      <div class="footer-links">
+        <a href={`${base}methodology/`}>Methodology & limitations</a>
+        <a href={`${base}data/`}>Downloads & attribution</a>
+        <a href="https://github.com/slicedearth/contract-delta-au">Source code ↗</a>
+      </div>
+      <p class="fine-print">
+        Not affiliated with or endorsed by the Australian Government. AusTender data is
+        attributed to the Department of Finance under CC BY 3.0 AU.
+      </p>
+    </footer>
+  </body>
+</html>

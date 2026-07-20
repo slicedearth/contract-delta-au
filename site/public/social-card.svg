@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#102725"/>
+  <g stroke="#34514c" stroke-width="1" opacity=".7">
+    <path d="M0 90h1200M0 180h1200M0 270h1200M0 360h1200M0 450h1200M0 540h1200"/>
+    <path d="M100 0v630M200 0v630M300 0v630M400 0v630M500 0v630M600 0v630M700 0v630M800 0v630M900 0v630M1000 0v630M1100 0v630"/>
+  </g>
+  <path d="M1020 82 1142 306H898l122-224Zm0 80-54 100h108l-54-100Z" fill="#c7f64f"/>
+  <text x="88" y="132" fill="#c7f64f" font-family="Arial, sans-serif" font-size="28" font-weight="700" letter-spacing="4">CONTRACTDELTA AU</text>
+  <text x="82" y="315" fill="#faf7ee" font-family="Georgia, serif" font-size="86">See the contract.</text>
+  <text x="82" y="410" fill="#c7f64f" font-family="Georgia, serif" font-size="86" font-style="italic">See the change.</text>
+  <text x="88" y="520" fill="#b9c6c2" font-family="Arial, sans-serif" font-size="28">Evidence-linked changes to Australian Government contracts.</text>
+</svg>

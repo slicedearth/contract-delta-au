@@ -1,0 +1,64 @@
+---
+import type { ChangeEvent } from "../types";
+import { formatDate, formatValue } from "../lib/format";
+
+interface Props {
+  event: ChangeEvent;
+}
+
+const { event } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const agency = event.agency_name ?? "Agency not reported";
+const supplier = event.supplier_name ?? "Supplier not reported";
+const description = event.description ?? "Contract record";
+const searchable = [event.contract_id, event.notice_id, agency, supplier, description]
+  .join(" ")
+  .toLocaleLowerCase("en-AU");
+---
+
+<article
+  class="change-card"
+  data-event
+  data-search={searchable}
+  data-agency={agency}
+  data-field={event.field_name}
+  data-direction={event.direction}
+>
+  <div class="change-card__topline">
+    <span class:list={["change-type", `change-type--${event.direction}`]}>
+      <span aria-hidden="true">{event.direction === "increase" || event.direction === "extension" ? "↗" : event.direction === "decrease" || event.direction === "reduction" ? "↘" : "↔"}</span>
+      {event.field_label}
+    </span>
+    <time datetime={event.detected_at}>{formatDate(event.detected_at)}</time>
+  </div>
+
+  <div class="change-card__identity">
+    <a href={`${base}contracts/${event.contract_id}/`}>{event.contract_id}</a>
+    <span aria-hidden="true">/</span>
+    <span>{event.notice_id}</span>
+  </div>
+  <h3>{description}</h3>
+  <p class="change-summary">{event.summary}</p>
+
+  <div class="before-after" aria-label={`${event.field_label} before and after`}>
+    <div>
+      <span>Before</span>
+      <strong>{formatValue(event.old_value, event.field_name)}</strong>
+    </div>
+    <span class="change-arrow" aria-hidden="true">→</span>
+    <div>
+      <span>After</span>
+      <strong>{formatValue(event.new_value, event.field_name)}</strong>
+    </div>
+  </div>
+
+  <dl class="change-card__parties">
+    <div><dt>Agency</dt><dd>{agency}</dd></div>
+    <div><dt>Supplier</dt><dd>{supplier}</dd></div>
+  </dl>
+
+  <div class="change-card__actions">
+    <a class="text-link" href={`${base}contracts/${event.contract_id}/`}>View timeline →</a>
+    <a class="text-link muted-link" href={event.source_url}>Primary record ↗</a>
+  </div>
+</article>

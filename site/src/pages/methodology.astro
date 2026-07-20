@@ -1,0 +1,111 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import rawDashboard from "../data/dashboard.json";
+import type { Dashboard } from "../types";
+
+const dashboard = rawDashboard as Dashboard;
+const base = import.meta.env.BASE_URL;
+---
+
+<BaseLayout
+  title="Methodology and limitations — ContractDelta AU"
+  description="How ContractDelta normalises, compares, verifies, and responsibly describes AusTender contract changes."
+>
+  <header class="page-hero methodology-hero">
+    <p class="eyebrow eyebrow--light"><span></span> Methodology</p>
+    <h1>Show the change.<br /><em>Keep the context.</em></h1>
+    <p>
+      A transparent account of what ContractDelta calculates, what it deliberately leaves
+      alone, and where a researcher must look next.
+    </p>
+  </header>
+
+  <section class="principle-grid">
+    <article><span>01</span><h2>Source fact</h2><p>A value, date, party, or category reported in a public AusTender OCDS release.</p></article>
+    <article><span>02</span><h2>Calculated fact</h2><p>A deterministic before-and-after difference, percentage, or calendar-day count.</p></article>
+    <article><span>03</span><h2>Context</h2><p>Notice sequence, agency, supplier, category, timestamps, and primary record links.</p></article>
+    <article><span>04</span><h2>Interpretation</h2><p>Reserved for researchers after reviewing source documents and surrounding evidence.</p></article>
+  </section>
+
+  <div class="methodology-layout">
+    <aside class="method-nav">
+      <p>On this page</p>
+      <a href="#collection">Collection</a>
+      <a href="#normalisation">Normalisation</a>
+      <a href="#comparison">Comparison</a>
+      <a href="#quality">Quality controls</a>
+      <a href="#limitations">Limitations</a>
+      <a href="#responsible-use">Responsible use</a>
+    </aside>
+    <div class="method-copy">
+      <section id="collection">
+        <p class="eyebrow"><span></span> Collection</p>
+        <h2>Evidence begins at the source</h2>
+        <p>
+          Scheduled runs query the public AusTender OCDS API by latest-modified date. Every
+          opaque next-page link is checked for HTTPS, the official host, and the expected path
+          before it is followed.
+        </p>
+        <p>
+          A date-range response can contain an amendment without its parent release. In that
+          case ContractDelta fetches the full Contract Notice history before comparing values.
+          This prevents an amendment from being mistaken for a newly published contract.
+        </p>
+      </section>
+      <section id="normalisation">
+        <p class="eyebrow"><span></span> Normalisation</p>
+        <h2>Compare meaning, not formatting</h2>
+        <ul class="check-list">
+          <li>Currency values use exact two-decimal arithmetic.</li>
+          <li>Contract timestamps are converted to the Canberra calendar date.</li>
+          <li>Source modification timestamps remain in UTC.</li>
+          <li>Whitespace, empty values, and HTML entities are normalised.</li>
+          <li>Explicit `-A#` identifiers define amendment order.</li>
+          <li>Contact details, ABNs, and addresses are discarded.</li>
+        </ul>
+      </section>
+      <section id="comparison">
+        <p class="eyebrow"><span></span> Comparison</p>
+        <h2>One event per changed field</h2>
+        <div class="formula-card">
+          <span>Value change</span>
+          <code>absolute = current − previous</code>
+          <code>percentage = absolute ÷ previous × 100</code>
+          <small>No percentage is calculated when the previous value is zero or absent.</small>
+        </div>
+        <p>
+          Each event records its before and after release IDs, normalised SHA-256 hashes,
+          source timestamp, primary record URL, and exact old and new values. Formatting-only
+          changes produce no event. Null-to-value transitions do.
+        </p>
+      </section>
+      <section id="quality">
+        <p class="eyebrow"><span></span> Quality controls</p>
+        <h2>Fail closed when confidence falls</h2>
+        <p>Publication stops when validation failures exceed 2%, all releases fail, pagination exceeds its bound, or a pagination link crosses the official source boundary.</p>
+        <p>Temporary source failures are retried. A temporarily missing record never deletes preserved history. Each successful run publishes a manifest with counts, failures, source URLs, parser version, and dataset hashes.</p>
+      </section>
+      <section id="limitations">
+        <p class="eyebrow"><span></span> Limitations</p>
+        <h2>What the data cannot prove</h2>
+        <ul class="limit-list">
+          <li><strong>Cause.</strong> A modification can be a correction or legitimate variation.</li>
+          <li><strong>Expenditure.</strong> Reported contract value is not annual or realised spending.</li>
+          <li><strong>Identity.</strong> A supplier name can change without a legal-entity change.</li>
+          <li><strong>Complete scope.</strong> The primary UNSPSC code does not describe every deliverable.</li>
+          <li><strong>Misconduct.</strong> No change, count, or magnitude is evidence of wrongdoing.</li>
+        </ul>
+      </section>
+      <section id="responsible-use" class="method-callout">
+        <p class="eyebrow eyebrow--light"><span></span> Responsible use</p>
+        <h2>Investigate carefully</h2>
+        <p>{dashboard.disclaimer}</p>
+        <p>Inspect primary records, seek surrounding documents, publish uncertainty, and give affected organisations a fair opportunity to provide context.</p>
+        <div class="hero__actions">
+          <a class="button button--light" href={`${base}#changes`}>Explore changes →</a>
+          <a class="button button--outline-light" href={`${base}data/`}>Download data</a>
+        </div>
+      </section>
+    </div>
+  </div>
+</BaseLayout>
