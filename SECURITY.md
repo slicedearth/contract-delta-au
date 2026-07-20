@@ -26,7 +26,8 @@ bounded dates, pages, amendment selection, backfill windows, timeouts, and retri
 Source text is rendered through Astro's escaping boundary. CSV text that could be interpreted
 as a spreadsheet formula is prefixed safely, while the JSON evidence retains the exact
 normalised value. The site also applies a restrictive content policy and referrer policy.
-Every cross-origin link explicitly suppresses referrer information.
+Same-origin connections support prefetched page navigation while cross-origin connections
+remain blocked. Every cross-origin link explicitly suppresses referrer information.
 
 Normalised names and descriptions pass a fail-closed scan for high-confidence email,
 business-identifier, Australian phone-number, and street-address patterns. Full state,

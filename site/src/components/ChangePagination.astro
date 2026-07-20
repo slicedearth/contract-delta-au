@@ -1,0 +1,79 @@
+---
+import { getChangePaginationItems } from "../lib/pagination";
+
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  position: "top" | "bottom";
+}
+
+const { currentPage, totalPages, position } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const pages = getChangePaginationItems(currentPage, totalPages);
+const pageHref = (page: number) => page === 1
+  ? `${base}#change-results`
+  : `${base}changes/${page}/#change-results`;
+const label = position === "top"
+  ? "Change feed pages above results"
+  : "Change feed pages below results";
+---
+
+<nav
+  id={position === "top" ? "change-results" : undefined}
+  class:list={["change-pagination", `change-pagination--${position}`]}
+  aria-label={label}
+>
+  {currentPage > 1
+    ? (
+      <a
+        class="change-pagination__step"
+        href={pageHref(currentPage - 1)}
+        rel="prev"
+        data-astro-prefetch="hover"
+      >
+        <span aria-hidden="true">←</span>
+        <span class="change-pagination__step-label">Previous</span>
+      </a>
+    )
+    : (
+      <span class="change-pagination__step" aria-disabled="true">
+        <span aria-hidden="true">←</span>
+        <span class="change-pagination__step-label">Previous</span>
+      </span>
+    )}
+
+  <ol class="change-pagination__pages">
+    {pages.map((page) => page === null
+      ? <li class="change-pagination__ellipsis" aria-hidden="true">…</li>
+      : (
+        <li class:list={{ "is-current": page === currentPage }}>
+          {page === currentPage
+            ? <span aria-current="page"><span class="visually-hidden">Page </span>{page}</span>
+            : (
+              <a href={pageHref(page)} data-astro-prefetch="hover" aria-label={`Go to page ${page}`}>
+                {page}
+              </a>
+            )}
+        </li>
+      ))}
+  </ol>
+
+  {currentPage < totalPages
+    ? (
+      <a
+        class="change-pagination__step"
+        href={pageHref(currentPage + 1)}
+        rel="next"
+        data-astro-prefetch="hover"
+      >
+        <span class="change-pagination__step-label">Next</span>
+        <span aria-hidden="true">→</span>
+      </a>
+    )
+    : (
+      <span class="change-pagination__step" aria-disabled="true">
+        <span class="change-pagination__step-label">Next</span>
+        <span aria-hidden="true">→</span>
+      </span>
+    )}
+</nav>

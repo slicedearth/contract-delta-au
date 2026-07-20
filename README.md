@@ -63,8 +63,9 @@ publication before data can enter private history or a deployment artifact.
 Full state, events, manifests, and checkpoints live in a separate private repository. The
 public repository retains source code, privacy-minimised fixtures, and non-identifying update
 counts. Production dashboard data and downloads are generated inside the deployment runner
-and are never committed to public Git history. The change feed uses 50-event static pages so
-every published event remains browsable without making any one page grow without bound.
+and are never committed to public Git history. The change feed uses 50-event static pages with
+prefetched client-side navigation and sticky controls, so every published event remains
+browsable without making any one page grow without bound.
 
 ## Local development
 

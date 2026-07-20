@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { ClientRouter } from "astro:transitions";
 
 interface Props {
   title?: string;
@@ -28,7 +29,7 @@ const imageUrl = new URL(`${base}${image}`, Astro.site);
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; base-uri 'self'; connect-src 'none'; font-src 'self'; form-action 'self'; frame-src 'none'; img-src 'self' data:; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests"
+      content="default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-src 'none'; img-src 'self' data:; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests"
     />
     <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
     <link rel="canonical" href={canonical} />
@@ -39,6 +40,7 @@ const imageUrl = new URL(`${base}${image}`, Astro.site);
     <meta property="og:image" content={imageUrl} />
     <meta name="twitter:card" content="summary_large_image" />
     <title>{title}</title>
+    <ClientRouter fallback="swap" />
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>

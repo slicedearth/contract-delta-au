@@ -1,5 +1,6 @@
 ---
 import ChangeCard from "./ChangeCard.astro";
+import ChangePagination from "./ChangePagination.astro";
 import type { ChangeEvent } from "../types";
 
 interface Props {
@@ -14,9 +15,6 @@ const base = import.meta.env.BASE_URL;
 const agencies = [...new Set(events.map((event) => event.agency_name).filter(Boolean))].sort();
 const fields = [...new Set(events.map((event) => event.field_name))].sort();
 const fieldLabels = new Map(events.map((event) => [event.field_name, event.field_label]));
-const pageHref = (page: number) => page === 1
-  ? `${base}#changes`
-  : `${base}changes/${page}/#changes`;
 ---
 
 <section class="content-section changes-section" id="changes" data-current-page={currentPage}>
@@ -77,6 +75,8 @@ const pageHref = (page: number) => page === 1
   </div>
   <p class="page-filter-note">Filters and the filtered CSV apply to this page.</p>
 
+  <ChangePagination currentPage={currentPage} totalPages={totalPages} position="top" />
+
   <div class="change-grid" data-change-grid>
     {events.map((event) => <ChangeCard event={event} />)}
   </div>
@@ -86,77 +86,69 @@ const pageHref = (page: number) => page === 1
     <p>Try a broader search or clear the filters.</p>
   </div>
 
-  <nav class="change-pagination" aria-label="Change feed pages">
-    <div>
-      {currentPage > 2 && <a href={pageHref(1)}>First</a>}
-      {currentPage > 1
-        ? <a href={pageHref(currentPage - 1)} rel="prev">← Previous</a>
-        : <span aria-disabled="true">← Previous</span>}
-    </div>
-    <p><strong>Page {currentPage}</strong> of {totalPages}</p>
-    <div>
-      {currentPage < totalPages
-        ? <a href={pageHref(currentPage + 1)} rel="next">Next →</a>
-        : <span aria-disabled="true">Next →</span>}
-      {currentPage < totalPages - 1 && <a href={pageHref(totalPages)}>Last</a>}
-    </div>
-  </nav>
+  <ChangePagination currentPage={currentPage} totalPages={totalPages} position="bottom" />
 </section>
 
 <script>
-  const form = document.querySelector<HTMLFormElement>("[data-filters]");
-  const cards = Array.from(document.querySelectorAll<HTMLElement>("[data-event]"));
-  const count = document.querySelector<HTMLElement>("[data-result-count]");
-  const empty = document.querySelector<HTMLElement>("[data-empty]");
-  const download = document.querySelector<HTMLButtonElement>("[data-download-filtered]");
-  const feed = document.querySelector<HTMLElement>("[data-current-page]");
+  const setupChangeFeed = () => {
+    const feed = document.querySelector<HTMLElement>("[data-current-page]");
+    if (!feed) return;
 
-  const applyFilters = () => {
-    if (!form) return;
-    const values = new FormData(form);
-    const query = String(values.get("query") ?? "").trim().toLocaleLowerCase("en-AU");
-    const agency = String(values.get("agency") ?? "");
-    const field = String(values.get("field") ?? "");
-    const direction = String(values.get("direction") ?? "");
-    let visible = 0;
+    const form = feed.querySelector<HTMLFormElement>("[data-filters]");
+    const cards = Array.from(feed.querySelectorAll<HTMLElement>("[data-event]"));
+    const count = feed.querySelector<HTMLElement>("[data-result-count]");
+    const empty = feed.querySelector<HTMLElement>("[data-empty]");
+    const download = feed.querySelector<HTMLButtonElement>("[data-download-filtered]");
 
-    cards.forEach((card) => {
-      const matches =
-        (!query || (card.dataset.search ?? "").includes(query)) &&
-        (!agency || card.dataset.agency === agency) &&
-        (!field || card.dataset.field === field) &&
-        (!direction || card.dataset.direction === direction);
-      card.hidden = !matches;
-      if (matches) visible += 1;
+    const applyFilters = () => {
+      if (!form) return;
+      const values = new FormData(form);
+      const query = String(values.get("query") ?? "").trim().toLocaleLowerCase("en-AU");
+      const agency = String(values.get("agency") ?? "");
+      const field = String(values.get("field") ?? "");
+      const direction = String(values.get("direction") ?? "");
+      let visible = 0;
+
+      cards.forEach((card) => {
+        const matches =
+          (!query || (card.dataset.search ?? "").includes(query)) &&
+          (!agency || card.dataset.agency === agency) &&
+          (!field || card.dataset.field === field) &&
+          (!direction || card.dataset.direction === direction);
+        card.hidden = !matches;
+        if (matches) visible += 1;
+      });
+
+      if (count) count.textContent = String(visible);
+      if (empty) empty.hidden = visible !== 0;
+      if (download) download.disabled = visible === 0;
+    };
+
+    form?.addEventListener("input", applyFilters);
+    form?.addEventListener("reset", () => window.setTimeout(applyFilters));
+
+    download?.addEventListener("click", () => {
+      const visible = cards.filter((card) => !card.hidden).map((card) => ({
+        contract_id: card.querySelector(".change-card__identity a")?.textContent?.trim() ?? "",
+        agency: card.dataset.agency ?? "",
+        field: card.dataset.field ?? "",
+        direction: card.dataset.direction ?? "",
+        summary: card.querySelector(".change-summary")?.textContent?.trim() ?? ""
+      }));
+      const neutralise = (value: string) => /^[=+\-@\t\r\n]/.test(value) ? `'${value}` : value;
+      const escape = (value: string) => `"${neutralise(value).replaceAll('"', '""')}"`;
+      const rows = ["contract_id,agency,field,direction,summary", ...visible.map((row) =>
+        [row.contract_id, row.agency, row.field, row.direction, row.summary].map(escape).join(",")
+      )];
+      const blob = new Blob([`${rows.join("\n")}\n`], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `contractdelta-changes-page-${feed.dataset.currentPage ?? "1"}.csv`;
+      anchor.click();
+      URL.revokeObjectURL(url);
     });
-
-    if (count) count.textContent = String(visible);
-    if (empty) empty.hidden = visible !== 0;
-    if (download) download.disabled = visible === 0;
   };
 
-  form?.addEventListener("input", applyFilters);
-  form?.addEventListener("reset", () => window.setTimeout(applyFilters));
-
-  download?.addEventListener("click", () => {
-    const visible = cards.filter((card) => !card.hidden).map((card) => ({
-      contract_id: card.querySelector(".change-card__identity a")?.textContent?.trim() ?? "",
-      agency: card.dataset.agency ?? "",
-      field: card.dataset.field ?? "",
-      direction: card.dataset.direction ?? "",
-      summary: card.querySelector(".change-summary")?.textContent?.trim() ?? ""
-    }));
-    const neutralise = (value: string) => /^[=+\-@\t\r\n]/.test(value) ? `'${value}` : value;
-    const escape = (value: string) => `"${neutralise(value).replaceAll('"', '""')}"`;
-    const rows = ["contract_id,agency,field,direction,summary", ...visible.map((row) =>
-      [row.contract_id, row.agency, row.field, row.direction, row.summary].map(escape).join(",")
-    )];
-    const blob = new Blob([`${rows.join("\n")}\n`], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = `contractdelta-changes-page-${feed?.dataset.currentPage ?? "1"}.csv`;
-    anchor.click();
-    URL.revokeObjectURL(url);
-  });
+  document.addEventListener("astro:page-load", setupChangeFeed);
 </script>
