@@ -158,7 +158,9 @@ The public repository uses standard GitHub-hosted Actions and GitHub Pages. No a
 server, database, account system, or paid production API is required. A repository-scoped
 deploy key is stored as an Actions secret and grants access only to the private data
 repository. The weekly updater also supports manual runs, commits durable data privately,
-and commits only non-identifying update status publicly.
+and commits only non-identifying update status publicly. Successful update and backfill runs
+then trigger deployment from the latest public and private revisions; failed data workflows do
+not publish a new site build.
 
 Expected recurring hosting cost: **$0** for a public repository using standard runners and
 the included static deployment. Bounded collection keeps request volume, repository growth,

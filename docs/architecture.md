@@ -23,7 +23,10 @@ always-running service.
    recent sample, and fails on definite missing-record responses.
 8. The historical workflow processes limited date windows and records an atomic checkpoint
    after each successful window.
-9. A repository-scoped deploy key connects the public workflow to the private data repository.
+9. A successful scheduled update or historical backfill triggers a fresh deployment after its
+   verified private state and non-identifying public status have been committed. Failed data
+   workflows do not publish a new site build.
+10. A repository-scoped deploy key connects the public workflow to the private data repository.
    Generated dashboard and evidence files exist in the runner and deployment artifact only.
 
 ## Trust boundaries
