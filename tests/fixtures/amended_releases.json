@@ -22,7 +22,7 @@
               "endDate": "2029-06-13T14:00:00Z"
             },
             "value": { "currency": "AUD", "amount": "317458.84" },
-            "items": [{ "classification": { "scheme": "UNSPSC", "id": "81162000" } }]
+            "items": [{ "id": "81162000-81b453210ee04eecb4b7d75d436750d1", "classification": { "scheme": "UNSPSC", "id": "81162000" } }]
           }
         ],
         "tender": { "procurementMethod": "open", "procurementMethodDetails": "Open tender" }
@@ -45,7 +45,7 @@
               "endDate": "2029-06-13T14:00:00Z"
             },
             "value": { "currency": "AUD", "amount": "349204.72" },
-            "items": [{ "classification": { "scheme": "UNSPSC", "id": "81162000" } }],
+            "items": [{ "id": "81162000-d895668dbbac43918a56df40c6558d75", "classification": { "scheme": "UNSPSC", "id": "81162000" } }],
             "amendments": [
               {
                 "id": "CN4260041-A1",
@@ -82,7 +82,7 @@
               "endDate": "2026-07-30T14:00:00Z"
             },
             "value": { "currency": "AUD", "amount": "134420.00" },
-            "items": [{ "classification": { "scheme": "UNSPSC", "id": "80161500" } }]
+            "items": [{ "id": "80161500-a7eff9f24a5542699deb5d7c68a67f86", "classification": { "scheme": "UNSPSC", "id": "80161500" } }]
           }
         ],
         "tender": { "procurementMethod": "limited", "procurementMethodDetails": "Limited tender" }
@@ -105,7 +105,7 @@
               "endDate": "2026-07-30T14:00:00Z"
             },
             "value": { "currency": "AUD", "amount": "95645.00" },
-            "items": [{ "classification": { "scheme": "UNSPSC", "id": "80161500" } }],
+            "items": [{ "id": "80161500-7206070bcbae4a279b8b4f3fc6b3f24c", "classification": { "scheme": "UNSPSC", "id": "80161500" } }],
             "amendments": [
               {
                 "id": "CN4259878-A1",
@@ -142,7 +142,7 @@
               "endDate": "2027-07-30T14:00:00Z"
             },
             "value": { "currency": "AUD", "amount": "75000.00" },
-            "items": [{ "classification": { "scheme": "UNSPSC", "id": "80120000" } }]
+            "items": [{ "id": "80120000-4a1bd0908f884f8e938cc015dadf5346", "classification": { "scheme": "UNSPSC", "id": "80120000" } }]
           }
         ],
         "tender": { "procurementMethod": "open", "procurementMethodDetails": "Open tender" }
@@ -165,7 +165,7 @@
               "endDate": "2027-07-30T14:00:00Z"
             },
             "value": { "currency": "AUD", "amount": "125000.00" },
-            "items": [{ "classification": { "scheme": "UNSPSC", "id": "80120000" } }],
+            "items": [{ "id": "80120000-4d68c23d7863416fb8b8c9bb12d8f1b3", "classification": { "scheme": "UNSPSC", "id": "80120000" } }],
             "amendments": [
               {
                 "id": "CN4175467-A1",
@@ -195,7 +195,7 @@
               "endDate": "2027-07-30T14:00:00Z"
             },
             "value": { "currency": "AUD", "amount": "175000.00" },
-            "items": [{ "classification": { "scheme": "UNSPSC", "id": "80120000" } }],
+            "items": [{ "id": "80120000-3e4cf3bc8e364666bfd684718ebd716d", "classification": { "scheme": "UNSPSC", "id": "80120000" } }],
             "amendments": [
               {
                 "id": "CN4175467-A2",
@@ -232,7 +232,7 @@
               "endDate": "2029-06-29T14:00:00Z"
             },
             "value": { "currency": "AUD", "amount": "2347567.64" },
-            "items": [{ "classification": { "scheme": "UNSPSC", "id": "93131703" } }]
+            "items": [{ "id": "93131703-cef0443390b947798c32b1997a515a34", "classification": { "scheme": "UNSPSC", "id": "93131703" } }]
           }
         ],
         "tender": { "procurementMethod": "limited", "procurementMethodDetails": "Limited tender" }
@@ -255,7 +255,7 @@
               "endDate": "2029-06-29T14:00:00Z"
             },
             "value": { "currency": "AUD", "amount": "2347567.64" },
-            "items": [{ "classification": { "scheme": "UNSPSC", "id": "93131703" } }],
+            "items": [{ "id": "93131703-184ce0b1debb4e46af78b89d3a80fea1", "classification": { "scheme": "UNSPSC", "id": "93131703" } }],
             "amendments": [
               {
                 "id": "CN4255613-A1",

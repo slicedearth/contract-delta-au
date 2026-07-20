@@ -22,6 +22,16 @@ class ContractVersion(BaseModel):
         max_length=2048,
         pattern=r"^https://api\.tenders\.gov\.au/ocds/findById/CN\d+$",
     )
+    official_record_url: str | None = Field(
+        default=None,
+        max_length=2048,
+        pattern=(
+            r"^https://www\.tenders\.gov\.au/(?:Cn/Show/[0-9a-f]{8}-[0-9a-f]{4}-"
+            r"[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|Search/CnAdvancedSearch\?"
+            r"SearchFrom=CnSearch&Type=Cn&AgencyStatus=-1&KeywordTypeSearch=AllWord&"
+            r"CnId=CN\d+&DateType=Publish%20Date)$"
+        ),
+    )
     source_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     agency_name: str = Field(min_length=1, max_length=500)
     supplier_name: str = Field(min_length=1, max_length=500)

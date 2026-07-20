@@ -10,7 +10,7 @@
   "parser_version": "0.1.0",
   "releases_normalised": 9,
   "releases_received": 9,
-  "retrieved_at": "2026-07-20T03:10:43.972838Z",
+  "retrieved_at": "2026-07-20T03:38:14.603375Z",
   "source_license": "https://creativecommons.org/licenses/by/3.0/au/",
   "source_publisher": "Australian Government Department of Finance",
   "source_urls": [
@@ -19,6 +19,6 @@
     "https://api.tenders.gov.au/ocds/findById/CN4259878",
     "https://api.tenders.gov.au/ocds/findById/CN4260041"
   ],
-  "state_sha256": "facef29bdeb8f1ed2fe7072af76ff4758934ae200ae8e18dfc2dee25e045d82c",
+  "state_sha256": "13af8a4b5496b056e84eb92abcea4fdbb36ba3e1201e7f289dd3f14e3de03316",
   "validation_failures": []
 }

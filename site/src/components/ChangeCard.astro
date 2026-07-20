@@ -59,6 +59,7 @@ const searchable = [event.contract_id, event.notice_id, agency, supplier, descri
 
   <div class="change-card__actions">
     <a class="text-link" href={`${base}contracts/${event.contract_id}/`}>View timeline →</a>
-    <a class="text-link muted-link" href={event.source_url}>Primary record ↗</a>
+    <a class="text-link" href={event.official_record_url}>Official record ↗</a>
+    <a class="text-link muted-link" href={event.source_url}>OCDS JSON ↗</a>
   </div>
 </article>

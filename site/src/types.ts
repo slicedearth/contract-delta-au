@@ -4,6 +4,7 @@ export interface Version {
   source_release_id: string;
   source_modified_at: string;
   source_url: string;
+  official_record_url: string;
   source_hash: string;
   agency_name: string;
   supplier_name: string;
@@ -34,6 +35,7 @@ export interface ChangeEvent {
   before_source_hash: string;
   after_source_hash: string;
   source_url: string;
+  official_record_url: string;
   source_license: string;
   source_publisher: string;
   adaptation_notice: string;
@@ -63,6 +65,7 @@ export interface Contract {
   latest_modified_at: string;
   amendment_count: number;
   source_url: string;
+  official_record_url: string;
   evidence_path: string;
   versions: Version[];
   events: ChangeEvent[];

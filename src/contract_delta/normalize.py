@@ -14,6 +14,7 @@ from zoneinfo import ZoneInfo
 from contract_delta.models import ContractVersion
 
 AUSTENDER_API = "https://api.tenders.gov.au"
+AUSTENDER_WEB = "https://www.tenders.gov.au"
 CANBERRA_TIME = ZoneInfo("Australia/Sydney")
 
 
@@ -91,6 +92,33 @@ def amendment_number(notice_id: str) -> int:
     return int(match.group(1)) if match else 0
 
 
+def official_record_url(
+    contract_id: str,
+    notice_id: str,
+    item_identifier: Any = None,
+    award_identifier: Any = None,
+) -> str:
+    """Return an exact AusTender record URL, or a safe CN search fallback."""
+
+    candidates = [item_identifier]
+    if amendment_number(notice_id) == 0:
+        candidates.append(award_identifier)
+    for candidate in candidates:
+        text = clean_text(candidate)
+        match = re.search(r"(?:^|-)([0-9a-fA-F]{32})$", text or "")
+        if match:
+            compact = match.group(1).lower()
+            record_uuid = "-".join(
+                (compact[:8], compact[8:12], compact[12:16], compact[16:20], compact[20:])
+            )
+            return f"{AUSTENDER_WEB}/Cn/Show/{record_uuid}"
+    return (
+        f"{AUSTENDER_WEB}/Search/CnAdvancedSearch?SearchFrom=CnSearch&Type=Cn"
+        f"&AgencyStatus=-1&KeywordTypeSearch=AllWord&CnId={contract_id}"
+        "&DateType=Publish%20Date"
+    )
+
+
 def normalise_release(release: dict[str, Any]) -> ContractVersion:
     """Extract the fields ContractDelta needs while excluding contact details and addresses."""
 
@@ -114,6 +142,7 @@ def normalise_release(release: dict[str, Any]) -> ContractVersion:
     value = contract.get("value") or {}
     items = contract.get("items") or []
     classification = (items[0].get("classification") or {}) if items else {}
+    awards = release.get("awards") or []
     tender = release.get("tender") or {}
 
     fields: dict[str, Any] = {
@@ -122,6 +151,12 @@ def normalise_release(release: dict[str, Any]) -> ContractVersion:
         "source_release_id": release_id,
         "source_modified_at": parse_source_datetime(release.get("date")),
         "source_url": f"{AUSTENDER_API}/ocds/findById/{contract_id}",
+        "official_record_url": official_record_url(
+            contract_id,
+            notice_id,
+            items[0].get("id") if items else None,
+            awards[0].get("id") if awards else None,
+        ),
         "agency_name": _party_name(release, "procuringEntity"),
         "supplier_name": _party_name(release, "supplier"),
         "title": clean_text(contract.get("title")),
@@ -134,7 +169,11 @@ def normalise_release(release: dict[str, Any]) -> ContractVersion:
         "contract_start_date": parse_contract_date(period.get("startDate")),
         "contract_end_date": parse_contract_date(period.get("endDate")),
     }
-    hash_payload = {key: value for key, value in fields.items() if not key.startswith("source_")}
+    hash_payload = {
+        key: value
+        for key, value in fields.items()
+        if not key.startswith("source_") and key != "official_record_url"
+    }
     fields["source_hash"] = _normalised_hash(hash_payload)
     return ContractVersion.model_validate(fields)
 

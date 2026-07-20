@@ -26,6 +26,7 @@ from contract_delta.normalize import (
     NormalisationError,
     amendment_number,
     normalise_release,
+    official_record_url,
     version_sort_key,
 )
 
@@ -154,10 +155,18 @@ def _plain_language(event: ChangeEvent, currency: str = "AUD") -> str:
     return f"{labels.get(field, field.replace('_', ' ').title())} changed."
 
 
+def _version_official_record_url(version: ContractVersion) -> str:
+    return version.official_record_url or official_record_url(
+        version.contract_id,
+        version.notice_id,
+    )
+
+
 def _event_for_site(
     event: ChangeEvent,
     currency: str = "AUD",
     *,
+    official_record: str,
     source_license: str = SOURCE_LICENSE,
     source_publisher: str = SOURCE_PUBLISHER,
 ) -> dict[str, Any]:
@@ -165,6 +174,7 @@ def _event_for_site(
     payload["direction"] = _direction(event)
     payload["summary"] = _plain_language(event, currency)
     payload["field_label"] = event.field_name.replace("_", " ").title()
+    payload["official_record_url"] = official_record
     payload["source_license"] = source_license
     payload["source_publisher"] = source_publisher
     payload["adaptation_notice"] = ADAPTATION_NOTICE
@@ -190,6 +200,28 @@ def _contract_for_site(
             value_change_percentage = (value_change / initial_value * 100).quantize(
                 Decimal("0.01")
             )
+    versions_by_release = {version.source_release_id: version for version in state.versions}
+
+    def event_for_site(event: ChangeEvent) -> dict[str, Any]:
+        after_version = versions_by_release.get(event.after_release_id)
+        record_url = (
+            _version_official_record_url(after_version)
+            if after_version is not None
+            else official_record_url(event.contract_id, event.notice_id)
+        )
+        return _event_for_site(
+            event,
+            latest.currency,
+            official_record=record_url,
+            source_license=source_license,
+            source_publisher=source_publisher,
+        )
+
+    site_versions = []
+    for version in state.versions:
+        payload = version.model_dump(mode="json")
+        payload["official_record_url"] = _version_official_record_url(version)
+        site_versions.append(payload)
     return {
         "contract_id": latest.contract_id,
         "notice_id": latest.notice_id,
@@ -209,17 +241,10 @@ def _contract_for_site(
         "latest_modified_at": latest.source_modified_at,
         "amendment_count": max(amendment_number(version.notice_id) for version in state.versions),
         "source_url": latest.source_url,
+        "official_record_url": _version_official_record_url(latest),
         "evidence_path": f"evidence/{latest.contract_id}.json",
-        "versions": [version.model_dump(mode="json") for version in state.versions],
-        "events": [
-            _event_for_site(
-                event,
-                latest.currency,
-                source_license=source_license,
-                source_publisher=source_publisher,
-            )
-            for event in events
-        ],
+        "versions": site_versions,
+        "events": [event_for_site(event) for event in events],
     }
 
 
@@ -264,16 +289,14 @@ def build_site_data(
 
     site_events: list[dict[str, Any]] = []
     contract_lookup = {contract["contract_id"]: contract for contract in contracts}
+    site_event_lookup = {
+        event["event_id"]: event for contract in contracts for event in contract["events"]
+    }
     for event in sorted(events, key=lambda item: (item.detected_at, item.event_id), reverse=True):
         contract = contract_lookup.get(event.contract_id)
         if contract is None:
             continue
-        item = _event_for_site(
-            event,
-            contract["currency"],
-            source_license=source_license,
-            source_publisher=source_publisher,
-        )
+        item = dict(site_event_lookup[event.event_id])
         item.update(
             {
                 "agency_name": contract["agency_name"],
@@ -370,6 +393,7 @@ def build_site_data(
             "absolute_change",
             "percentage_change",
             "duration_change_days",
+            "official_record_url",
             "source_url",
             "source_publisher",
             "source_license",
@@ -462,6 +486,30 @@ def process_releases(
         seen = set(record.seen_release_ids)
         for version in incoming_versions:
             if version.source_release_id in seen:
+                existing_version = next(
+                    (
+                        known
+                        for known in record.versions
+                        if known.source_release_id == version.source_release_id
+                    ),
+                    None,
+                )
+                if existing_version is not None and version.official_record_url:
+                    existing_exact = bool(
+                        existing_version.official_record_url
+                        and "/Cn/Show/" in existing_version.official_record_url
+                    )
+                    incoming_exact = "/Cn/Show/" in version.official_record_url
+                    if (
+                        existing_exact
+                        and incoming_exact
+                        and existing_version.official_record_url != version.official_record_url
+                    ):
+                        raise DataQualityError(
+                            "official record identifier changed; manual review is required"
+                        )
+                    if not existing_exact:
+                        existing_version.official_record_url = version.official_record_url
                 duplicate_releases += 1
                 continue
             latest = record.latest

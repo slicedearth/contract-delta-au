@@ -14,6 +14,14 @@ def test_pipeline_builds_idempotent_evidence_assets(
     fixture_releases: list[dict],
 ) -> None:
     first = process_releases(fixture_releases, root=tmp_path, source_urls=["fixture"])
+
+    state_path = tmp_path / "data/state/current-contracts.json"
+    legacy_state = json.loads(state_path.read_text(encoding="utf-8"))
+    for record in legacy_state.values():
+        for version in record["versions"]:
+            version.pop("official_record_url")
+    state_path.write_text(json.dumps(legacy_state), encoding="utf-8")
+
     second = process_releases(fixture_releases, root=tmp_path, source_urls=["fixture"])
 
     assert first.contracts_in_state == 4
@@ -41,6 +49,16 @@ def test_pipeline_builds_idempotent_evidence_assets(
     assert public_events[0]["source_publisher"] == "Australian Government Department of Finance"
     assert public_events[0]["source_license"].endswith("/by/3.0/au/")
     assert public_events[0]["adaptation_notice"].startswith("Adapted and normalised")
+    assert public_events[0]["official_record_url"].startswith(
+        "https://www.tenders.gov.au/Cn/Show/"
+    )
+
+    migrated_state = json.loads(state_path.read_text(encoding="utf-8"))
+    assert all(
+        version["official_record_url"].startswith("https://www.tenders.gov.au/Cn/Show/")
+        for record in migrated_state.values()
+        for version in record["versions"]
+    )
 
 
 def test_out_of_order_versions_do_not_roll_back_state(

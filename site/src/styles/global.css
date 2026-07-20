@@ -712,7 +712,13 @@ select {
 }
 
 .change-card__actions {
+  flex-wrap: wrap;
+  justify-content: flex-start;
   margin-top: 1.25rem;
+}
+
+.change-card__actions > :first-child {
+  margin-right: auto;
 }
 
 .muted-link {
@@ -1240,7 +1246,7 @@ tbody th {
   position: absolute;
   left: 0;
   color: var(--coral);
-  content: "—";
+  content: "!";
   font-weight: 800;
 }
 
@@ -1569,6 +1575,14 @@ tbody th {
   font-family: var(--mono);
   font-size: 0.55rem;
   text-transform: uppercase;
+}
+
+.timeline__record-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin-top: 1rem;
+  font-size: 0.7rem;
 }
 
 .timeline-change {

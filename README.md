@@ -16,7 +16,7 @@ methods change over time.
 - reproducible before-and-after comparisons
 - amendment timelines ordered by AusTender's explicit `-A#` identifiers
 - agency and supplier summaries
-- direct links to primary OCDS source records
+- direct links to official AusTender records and OCDS JSON
 - downloadable JSON evidence and CSV change data
 - source hashes, retrieval manifests, and quality-stop checks
 
@@ -101,9 +101,8 @@ docs/                     architecture, methodology, ethics, and data definition
 ## Automation and cost
 
 The public repository uses standard GitHub-hosted Actions and GitHub Pages. No application
-server, database, account system, secret, paid API, or production language-model dependency
-is required. The weekly updater also supports manual runs and commits only when derived data
-changes.
+server, database, account system, secret, or paid production API is required. The weekly
+updater also supports manual runs and commits only when derived data changes.
 
 Expected recurring hosting cost: **$0** for a public repository using standard runners and
 the included static deployment.

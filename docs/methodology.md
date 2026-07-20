@@ -4,10 +4,10 @@
 
 ContractDelta separates four layers:
 
-1. **Source fact** — a field reported in an AusTender OCDS release.
-2. **Calculated fact** — a deterministic difference, percentage, or day count.
-3. **Context** — the agency, supplier, category, amendment number, and contract period.
-4. **Interpretation** — left to the researcher after inspecting primary records and other
+1. **Source fact:** a field reported in an AusTender OCDS release.
+2. **Calculated fact:** a deterministic difference, percentage, or day count.
+3. **Context:** the agency, supplier, category, amendment number, and contract period.
+4. **Interpretation:** left to the researcher after inspecting primary records and other
    evidence.
 
 The application does not calculate a corruption, fraud, risk, or suspicion score.
@@ -60,6 +60,10 @@ requires a manual licensing and attribution review before any new derived data i
 
 The manifest makes partial validation failures visible even when they remain below the stop
 threshold.
+
+Published events distinguish the human-readable official Contract Notice from the
+machine-readable OCDS JSON source. When the source does not expose a valid page identifier,
+the official-record link falls back to an AusTender search for the parent CN ID.
 
 CSV exports neutralise text that spreadsheet applications could otherwise interpret as a
 formula. JSON evidence preserves the exact normalised text.

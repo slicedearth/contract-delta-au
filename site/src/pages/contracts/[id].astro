@@ -19,7 +19,7 @@ interface Props {
 const { contract } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const valueDirection = Number(contract.value_change ?? 0) >= 0 ? "increase" : "decrease";
-const title = `${contract.contract_id}: ${contract.description} — ContractDelta AU`;
+const title = `${contract.contract_id}: ${contract.description} | ContractDelta AU`;
 const description = `${contract.amendment_count} amendments and ${contract.events.length} field changes for ${contract.contract_id}.`;
 ---
 
@@ -45,7 +45,7 @@ const description = `${contract.amendment_count} amendments and ${contract.event
       <div>
         <p class="eyebrow"><span></span> Reported contract value</p>
         <h2 id="reported-value-heading">{formatMoney(contract.current_reported_value, contract.currency)}</h2>
-        <p>Current maximum value reported over the contract’s life—not annual expenditure.</p>
+        <p>Current maximum value reported over the contract’s life; it is not annual expenditure.</p>
       </div>
       {contract.value_change !== null && (
         <div class:list={["total-delta", `total-delta--${valueDirection}`]}>
@@ -85,7 +85,7 @@ const description = `${contract.amendment_count} amendments and ${contract.event
                   </div>
                   <dl class="timeline__facts">
                     <div><dt>Reported value</dt><dd>{formatMoney(version.reported_value, version.currency)}</dd></div>
-                    <div><dt>Contract period</dt><dd>{formatDate(version.contract_start_date)} — {formatDate(version.contract_end_date)}</dd></div>
+                    <div><dt>Contract period</dt><dd>{formatDate(version.contract_start_date)} to {formatDate(version.contract_end_date)}</dd></div>
                     <div><dt>Supplier</dt><dd>{version.supplier_name}</dd></div>
                   </dl>
                   {versionEvents.length > 0 && (
@@ -104,6 +104,10 @@ const description = `${contract.amendment_count} amendments and ${contract.event
                       ))}
                     </div>
                   )}
+                  <div class="timeline__record-links">
+                    <a class="text-link" href={version.official_record_url}>Official record ↗</a>
+                    <a class="text-link muted-link" href={version.source_url}>OCDS JSON ↗</a>
+                  </div>
                   <details class="evidence-details">
                     <summary>Evidence identifiers</summary>
                     <dl>
@@ -133,9 +137,10 @@ const description = `${contract.amendment_count} amendments and ${contract.event
         <section class="evidence-box">
           <span aria-hidden="true">⌁</span>
           <h2>Inspect the evidence</h2>
-          <p>The bundle includes normalised versions, field events, release IDs, and hashes.</p>
-          <a class="button button--primary" href={`${base}${contract.evidence_path}`} download>Download evidence JSON</a>
-          <a class="button button--ghost-dark" href={contract.source_url}>Open primary record ↗</a>
+          <p>Compare the official notice with the source JSON and ContractDelta evidence bundle.</p>
+          <a class="button button--primary" href={contract.official_record_url}>Open official record ↗</a>
+          <a class="button button--ghost-dark" href={contract.source_url}>Open OCDS JSON ↗</a>
+          <a class="button button--ghost-dark" href={`${base}${contract.evidence_path}`} download>Download evidence JSON ↓</a>
         </section>
         <section class="sidebar-note">
           <h2>Use with care</h2>

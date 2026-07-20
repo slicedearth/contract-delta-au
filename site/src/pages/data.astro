@@ -9,7 +9,7 @@ const base = import.meta.env.BASE_URL;
 ---
 
 <BaseLayout
-  title="Data and downloads — ContractDelta AU"
+  title="Data and downloads | ContractDelta AU"
   description="Download ContractDelta change events and inspect agency and supplier summaries."
 >
   <header class="page-hero">
@@ -25,7 +25,7 @@ const base = import.meta.env.BASE_URL;
     <div>
       <span>01</span>
       <h2>Change events CSV</h2>
-      <p>One row per changed field, with before and after values and the primary record URL.</p>
+      <p>One row per changed field, with before and after values, an official record link, and the OCDS JSON source.</p>
       <a class="button button--primary" href={`${base}data/change-events.csv`} download>Download CSV ↓</a>
     </div>
     <div>
@@ -37,7 +37,7 @@ const base = import.meta.env.BASE_URL;
     <div>
       <span>03</span>
       <h2>Per-contract evidence</h2>
-      <p>Each contract timeline provides a dedicated JSON bundle alongside its primary source.</p>
+      <p>Each contract timeline links the official notice, OCDS JSON, and a dedicated evidence bundle.</p>
       <a class="button button--ghost-dark" href={`${base}#changes`}>Browse contracts →</a>
     </div>
   </section>

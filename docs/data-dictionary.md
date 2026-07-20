@@ -8,6 +8,8 @@
 | `notice_id` | Parent or explicit amendment ID, such as `CN4260041-A1` |
 | `source_release_id` | OCDS release identifier used for provenance and deduplication |
 | `source_modified_at` | UTC timestamp reported by the source release |
+| `official_record_url` | Human-readable AusTender Contract Notice or amendment page; falls back to an official CN search when an exact page identifier is unavailable |
+| `source_url` | Machine-readable AusTender OCDS JSON endpoint for the Contract Notice |
 | `source_hash` | SHA-256 of the privacy-minimised normalised contract fields |
 | `agency_name` | Source party with the `procuringEntity` role |
 | `supplier_name` | Source party with the `supplier` role |
@@ -30,7 +32,8 @@
 | `duration_change_days` | New date minus old date in calendar days |
 | `before_release_id` / `after_release_id` | OCDS releases supporting the comparison |
 | `before_source_hash` / `after_source_hash` | Normalised evidence hashes |
-| `source_url` | Primary AusTender OCDS endpoint for the Contract Notice |
+| `official_record_url` | Human-readable AusTender page for the after-release notice |
+| `source_url` | Machine-readable AusTender OCDS JSON endpoint for the Contract Notice |
 
 ## Excluded source fields
 
