@@ -8,7 +8,8 @@ methods change over time.
 
 [View the dashboard](https://slicedearth.github.io/contract-delta-au/) ·
 [Read the methodology](docs/methodology.md) ·
-[Inspect the data dictionary](docs/data-dictionary.md)
+[Inspect the data dictionary](docs/data-dictionary.md) ·
+[Review legal and licensing notes](docs/legal-and-licensing.md)
 
 ## What it shows
 
@@ -54,7 +55,8 @@ street addresses are deliberately excluded.
 
 ## Local development
 
-Requirements: Python 3.12+ and Node.js 22+.
+Requirements: Python 3.12+ and Node.js 24 LTS. Python 3.14 and npm 12 are used by
+automation; Python 3.12 remains the supported compatibility floor.
 
 ```bash
 python3 -m venv .venv
@@ -106,6 +108,10 @@ changes.
 Expected recurring hosting cost: **$0** for a public repository using standard runners and
 the included static deployment.
 
+Current runtime and dependency choices, including deliberate compatibility constraints, are
+recorded in [the dependency policy](docs/dependency-policy.md). Dependabot checks Python,
+site, and workflow dependencies each week.
+
 ## Primary sources and attribution
 
 - [AusTender OCDS API documentation](https://github.com/austender/austender-ocds-api)
@@ -115,4 +121,8 @@ the included static deployment.
 AusTender-derived data and fixtures are attributed to the Australian Government Department
 of Finance and used under the
 [Creative Commons Attribution 3.0 Australia licence](https://creativecommons.org/licenses/by/3.0/au/).
-The application source code is available under the [MIT Licence](LICENSE).
+ContractDelta selects, normalises, and compares that material and clearly marks these
+adaptations in downloadable outputs. The application source code and original project
+documentation are available under the [MIT Licence](LICENSE); the MIT Licence does not
+relicense the source-derived data. See [the legal and licensing notes](docs/legal-and-licensing.md)
+and [NOTICE](NOTICE) for the full boundary.

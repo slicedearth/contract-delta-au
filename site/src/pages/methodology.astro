@@ -83,7 +83,8 @@ const base = import.meta.env.BASE_URL;
         <p class="eyebrow"><span></span> Quality controls</p>
         <h2>Fail closed when confidence falls</h2>
         <p>Publication stops when validation failures exceed 2%, all releases fail, pagination exceeds its bound, or a pagination link crosses the official source boundary.</p>
-        <p>Temporary source failures are retried. A temporarily missing record never deletes preserved history. Each successful run publishes a manifest with counts, failures, source URLs, parser version, and dataset hashes.</p>
+        <p>Publication also stops if the source publisher or data licence changes unexpectedly. Temporary source failures are retried, and a temporarily missing record never deletes preserved history.</p>
+        <p>Each successful run publishes a manifest with counts, failures, source URLs, parser version, and dataset hashes. CSV text is neutralised when it could be interpreted as a spreadsheet formula; JSON retains the exact normalised value.</p>
       </section>
       <section id="limitations">
         <p class="eyebrow"><span></span> Limitations</p>
@@ -94,6 +95,7 @@ const base = import.meta.env.BASE_URL;
           <li><strong>Identity.</strong> A supplier name can change without a legal-entity change.</li>
           <li><strong>Complete scope.</strong> The primary UNSPSC code does not describe every deliverable.</li>
           <li><strong>Misconduct.</strong> No change, count, or magnitude is evidence of wrongdoing.</li>
+          <li><strong>Privacy.</strong> A supplier name can identify an individual even though contact details and addresses are excluded.</li>
         </ul>
       </section>
       <section id="responsible-use" class="method-callout">

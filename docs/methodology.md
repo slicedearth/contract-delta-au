@@ -55,8 +55,14 @@ if pagination exceeds its configured bound, or if the source provides an unsafe 
 Temporary source failures are retried. A temporarily absent contract never deletes local
 history.
 
+Publication also stops if the source publisher or data licence changes unexpectedly. That
+requires a manual licensing and attribution review before any new derived data is published.
+
 The manifest makes partial validation failures visible even when they remain below the stop
 threshold.
+
+CSV exports neutralise text that spreadsheet applications could otherwise interpret as a
+formula. JSON evidence preserves the exact normalised text.
 
 ## Limitations
 
@@ -66,3 +72,5 @@ threshold.
 - Supplier naming is source-reported and may change without a legal-entity change.
 - Category codes describe a primary classification, not every good or service supplied.
 - A source record and surrounding procurement documentation remain necessary for context.
+- Supplier names can identify sole traders or other individuals even when contact fields are
+  excluded; do not enrich or republish unnecessary personal information.

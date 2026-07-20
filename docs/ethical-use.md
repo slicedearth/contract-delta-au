@@ -14,3 +14,7 @@ Users should:
 
 ContractDelta deliberately excludes unnecessary personal and contact information. Please do
 not reintroduce it in issues, fixtures, exports, or derivative work.
+
+Public availability is not a reason to aggregate personal information beyond the procurement
+purpose. Supplier and agency names are retained for contract analysis; contact names, phone
+numbers, email addresses, ABNs, and street or postal addresses are discarded.

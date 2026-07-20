@@ -1,11 +1,21 @@
-ContractDelta AU includes derived Australian Government procurement data.
+ContractDelta AU includes adapted Australian Government procurement data.
 
-AusTender Contract Notice data is provided by the Australian Government
-Department of Finance under the Creative Commons Attribution 3.0 Australia
-licence: https://creativecommons.org/licenses/by/3.0/au/
+Source work: AusTender Contract Notice data
+Attribution party: Australian Government Department of Finance
+Source: https://api.tenders.gov.au/ocds/
+Licence: Creative Commons Attribution 3.0 Australia
+Licence URI: https://creativecommons.org/licenses/by/3.0/au/
 
-The source API is available at https://api.tenders.gov.au/ocds/ and its public
-documentation is maintained at https://github.com/austender/austender-ocds-api.
+ContractDelta AU adapts the source material by selecting privacy-minimised fields,
+normalising values and dates, calculating field-level differences, ordering releases,
+and adding evidence hashes and explanatory text. These transformations are independent
+and are not official Department of Finance records or calculations.
+
+Files under `data/`, `tests/fixtures/`, `site/src/data/`, `site/public/data/`, and
+`site/public/evidence/` that contain AusTender-derived material remain subject to the
+source Creative Commons licence. They are not relicensed under the repository's MIT
+Licence. The MIT Licence applies to the original application source code and project
+documentation.
 
 ContractDelta AU is an independent project and is not affiliated with or
 endorsed by the Australian Government.
