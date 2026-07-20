@@ -1,0 +1,197 @@
+{
+  "CN4175467": {
+    "seen_release_ids": [
+      "prod-ec6c2b76eedd4f54a3187ca0a9caf278-9af03fc92ed7373fb750cf2e5c060076",
+      "prod-ec6c2b76eedd4f54a3187ca0a9caf278-74c0d87a265231d6aef024b299a0eb07",
+      "prod-ec6c2b76eedd4f54a3187ca0a9caf278-d29b58ab2d6133d99a19e270fa03a0a3"
+    ],
+    "versions": [
+      {
+        "agency_name": "Australian Bureau of Statistics",
+        "category_code": "80120000",
+        "contract_end_date": "2027-07-31",
+        "contract_id": "CN4175467",
+        "contract_start_date": "2025-07-30",
+        "currency": "AUD",
+        "description": "Legal Services",
+        "notice_id": "CN4175467",
+        "procurement_method": "Open tender",
+        "reported_value": "75000.00",
+        "source_hash": "84c27212ede83a8dacd50c32ef4a95bf6d7def8c3f97ea8b4f4c5cee3a97c2df",
+        "source_modified_at": "2025-07-31T00:26:28Z",
+        "source_release_id": "prod-ec6c2b76eedd4f54a3187ca0a9caf278-9af03fc92ed7373fb750cf2e5c060076",
+        "source_url": "https://api.tenders.gov.au/ocds/findById/CN4175467",
+        "supplier_name": "Clayton Utz",
+        "title": "ABS2025.157"
+      },
+      {
+        "agency_name": "Australian Bureau of Statistics",
+        "category_code": "80120000",
+        "contract_end_date": "2027-07-31",
+        "contract_id": "CN4175467",
+        "contract_start_date": "2025-07-30",
+        "currency": "AUD",
+        "description": "Legal Services",
+        "notice_id": "CN4175467-A1",
+        "procurement_method": "Open tender",
+        "reported_value": "125000.00",
+        "source_hash": "6e2ead1db6eab264d6bcc231cafc507b27a7016bbb8372ae5578b7250c31a566",
+        "source_modified_at": "2026-07-15T04:56:06Z",
+        "source_release_id": "prod-ec6c2b76eedd4f54a3187ca0a9caf278-74c0d87a265231d6aef024b299a0eb07",
+        "source_url": "https://api.tenders.gov.au/ocds/findById/CN4175467",
+        "supplier_name": "Clayton Utz",
+        "title": "ABS2025.157"
+      },
+      {
+        "agency_name": "Australian Bureau of Statistics",
+        "category_code": "80120000",
+        "contract_end_date": "2027-07-31",
+        "contract_id": "CN4175467",
+        "contract_start_date": "2025-07-30",
+        "currency": "AUD",
+        "description": "Legal Services",
+        "notice_id": "CN4175467-A2",
+        "procurement_method": "Open tender",
+        "reported_value": "175000.00",
+        "source_hash": "63545b681bb0dc0e820d30e7010e997cc9d93e98ceee90de8613ef1e2374aa35",
+        "source_modified_at": "2026-07-15T04:56:06Z",
+        "source_release_id": "prod-ec6c2b76eedd4f54a3187ca0a9caf278-d29b58ab2d6133d99a19e270fa03a0a3",
+        "source_url": "https://api.tenders.gov.au/ocds/findById/CN4175467",
+        "supplier_name": "Clayton Utz",
+        "title": "ABS2025.157"
+      }
+    ]
+  },
+  "CN4255613": {
+    "seen_release_ids": [
+      "prod-92cb8e4605464725990b1b6da445d61e-886856a9ea9536efba9e03f1d91d028f",
+      "prod-92cb8e4605464725990b1b6da445d61e-5002f6e466ce3ea682fdb5d62784d7ae"
+    ],
+    "versions": [
+      {
+        "agency_name": "Department of Agriculture, Fisheries and Forestry",
+        "category_code": "93131703",
+        "contract_end_date": "2029-06-30",
+        "contract_id": "CN4255613",
+        "contract_start_date": "2026-07-01",
+        "currency": "AUD",
+        "description": "Australian Milk Residue Analysis Survey 2026-2029",
+        "notice_id": "CN4255613",
+        "procurement_method": "Limited tender",
+        "reported_value": "2347567.64",
+        "source_hash": "f5d0c99dfd2a50b5fdb8aef78ebf44f417fb69447dfad344ba0f4a1ee998cc4c",
+        "source_modified_at": "2026-06-30T00:09:16Z",
+        "source_release_id": "prod-92cb8e4605464725990b1b6da445d61e-886856a9ea9536efba9e03f1d91d028f",
+        "source_url": "https://api.tenders.gov.au/ocds/findById/CN4255613",
+        "supplier_name": "DAIRY FOOD SAFETY VICTORIA",
+        "title": "C17874"
+      },
+      {
+        "agency_name": "Department of Agriculture, Fisheries and Forestry",
+        "category_code": "93131703",
+        "contract_end_date": "2029-06-30",
+        "contract_id": "CN4255613",
+        "contract_start_date": "2026-07-01",
+        "currency": "AUD",
+        "description": "Australian Milk Residue Analysis Survey 2026-2029",
+        "notice_id": "CN4255613-A1",
+        "procurement_method": "Limited tender",
+        "reported_value": "2347567.64",
+        "source_hash": "588fbb984b4dad3720b8447b41d5c675ef39a11081b1d7c23456808a6066d3a3",
+        "source_modified_at": "2026-07-15T04:43:56Z",
+        "source_release_id": "prod-92cb8e4605464725990b1b6da445d61e-5002f6e466ce3ea682fdb5d62784d7ae",
+        "source_url": "https://api.tenders.gov.au/ocds/findById/CN4255613",
+        "supplier_name": "SAFE FOOD VICTORIA",
+        "title": "C17874"
+      }
+    ]
+  },
+  "CN4259878": {
+    "seen_release_ids": [
+      "prod-802aa9fb8a374412939898828ba4743a-c5e85438ab3932f5b67984af17a9eb81",
+      "prod-802aa9fb8a374412939898828ba4743a-578bd08b098535cba15afa34159c3744"
+    ],
+    "versions": [
+      {
+        "agency_name": "Department of Defence",
+        "category_code": "80161500",
+        "contract_end_date": "2026-07-31",
+        "contract_id": "CN4259878",
+        "contract_start_date": "2026-06-22",
+        "currency": "AUD",
+        "description": "Analytical Services",
+        "notice_id": "CN4259878",
+        "procurement_method": "Limited tender",
+        "reported_value": "134420.00",
+        "source_hash": "e4970f12c51c21e98659a97694b5db54e4ea507b6f121e3c9457be356ee62ec2",
+        "source_modified_at": "2026-07-09T05:59:10Z",
+        "source_release_id": "prod-802aa9fb8a374412939898828ba4743a-c5e85438ab3932f5b67984af17a9eb81",
+        "source_url": "https://api.tenders.gov.au/ocds/findById/CN4259878",
+        "supplier_name": "HASKONING AUSTRALIA PTY LIMITED T/A ROYAL HASKONING",
+        "title": "4610005299"
+      },
+      {
+        "agency_name": "Department of Defence",
+        "category_code": "80161500",
+        "contract_end_date": "2026-07-31",
+        "contract_id": "CN4259878",
+        "contract_start_date": "2026-06-22",
+        "currency": "AUD",
+        "description": "Analytical Services",
+        "notice_id": "CN4259878-A1",
+        "procurement_method": "Limited tender",
+        "reported_value": "95645.00",
+        "source_hash": "d1497eb061a83a9a01aa135e8d863d5c281c653323c189ff64ce18e028d3cab5",
+        "source_modified_at": "2026-07-15T03:26:57Z",
+        "source_release_id": "prod-802aa9fb8a374412939898828ba4743a-578bd08b098535cba15afa34159c3744",
+        "source_url": "https://api.tenders.gov.au/ocds/findById/CN4259878",
+        "supplier_name": "HASKONING AUSTRALIA PTY LIMITED T/A ROYAL HASKONING",
+        "title": "4610005299"
+      }
+    ]
+  },
+  "CN4260041": {
+    "seen_release_ids": [
+      "prod-0eb1223926e34116b9b43844c195a08b-95ba33e131a13e808a2f34a7209ea158",
+      "prod-0eb1223926e34116b9b43844c195a08b-74f777d1ceb93189830a023d9cedf631"
+    ],
+    "versions": [
+      {
+        "agency_name": "Department of the Senate",
+        "category_code": "81162000",
+        "contract_end_date": "2029-06-14",
+        "contract_id": "CN4260041",
+        "contract_start_date": "2026-06-15",
+        "currency": "AUD",
+        "description": "Software as a service plus CiA Live fee",
+        "notice_id": "CN4260041",
+        "procurement_method": "Open tender",
+        "reported_value": "317458.84",
+        "source_hash": "d7fcef799d55f6184c30ae16293970536abce31d9c2e0e2d383b3f5697cff780",
+        "source_modified_at": "2026-07-10T03:02:48Z",
+        "source_release_id": "prod-0eb1223926e34116b9b43844c195a08b-95ba33e131a13e808a2f34a7209ea158",
+        "source_url": "https://api.tenders.gov.au/ocds/findById/CN4260041",
+        "supplier_name": "Technology One",
+        "title": "CN000605 - PO002060"
+      },
+      {
+        "agency_name": "Department of the Senate",
+        "category_code": "81162000",
+        "contract_end_date": "2029-06-14",
+        "contract_id": "CN4260041",
+        "contract_start_date": "2026-06-15",
+        "currency": "AUD",
+        "description": "Software as a service plus CiA Live fee",
+        "notice_id": "CN4260041-A1",
+        "procurement_method": "Open tender",
+        "reported_value": "349204.72",
+        "source_hash": "75b8670982b2d522b209dd183f38eefbb768ba67aed241b81a0418c55c499e86",
+        "source_modified_at": "2026-07-15T04:48:41Z",
+        "source_release_id": "prod-0eb1223926e34116b9b43844c195a08b-74f777d1ceb93189830a023d9cedf631",
+        "source_url": "https://api.tenders.gov.au/ocds/findById/CN4260041",
+        "supplier_name": "Technology One",
+        "title": "CN000605 - PO002060"
+      }
+    ]
+  }
+}

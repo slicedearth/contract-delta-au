@@ -1,0 +1,11 @@
+ContractDelta AU includes derived Australian Government procurement data.
+
+AusTender Contract Notice data is provided by the Australian Government
+Department of Finance under the Creative Commons Attribution 3.0 Australia
+licence: https://creativecommons.org/licenses/by/3.0/au/
+
+The source API is available at https://api.tenders.gov.au/ocds/ and its public
+documentation is maintained at https://github.com/austender/austender-ocds-api.
+
+ContractDelta AU is an independent project and is not affiliated with or
+endorsed by the Australian Government.
