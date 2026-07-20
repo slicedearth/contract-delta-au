@@ -39,3 +39,27 @@
 
 Contact names, phone numbers, email addresses, ABNs, street addresses, and postal addresses are
 not required for contract-change analysis and are not retained.
+
+## Collection coverage
+
+| Field | Meaning |
+|---|---|
+| `mode` | Whether the run processed supplied releases, a saved fixture, or a bounded amendment selection |
+| `selection_method` | Plain-language description of the deterministic coverage rule |
+| `query_start` / `query_end` | UTC boundaries of the latest-modified interval |
+| `max_amended_contracts` | Maximum amendment contracts retained from that interval |
+| `amended_contracts_discovered` | Distinct explicit amendment contracts found before selection |
+| `amended_contracts_selected` | Distinct amendment contracts selected for processing |
+| `amended_contracts_skipped` | Discovered contracts outside the configured cap |
+
+These fields describe the most recent collection interval in the source manifest and public
+dashboard. Historical checkpoint files add cumulative window and event counts for a specified
+range.
+
+## Public update status
+
+`site/src/data/update-status.json` is the only production update record committed to the public
+repository. It contains retrieval and latest-source timestamps, private-state contract and
+event counts, collection coverage, and the corresponding private revision. It deliberately
+excludes contract IDs, notice IDs, agency names, supplier names, descriptions, values, source
+URLs, release IDs, and evidence hashes.

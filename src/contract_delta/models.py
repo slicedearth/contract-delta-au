@@ -98,6 +98,25 @@ class ContractState(BaseModel):
         return self.versions[-1]
 
 
+class CollectionCoverage(BaseModel):
+    """Selection boundaries and counts for one source collection interval."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    mode: Literal["all_releases", "bounded_amendments", "fixture"] = "all_releases"
+    selection_method: str = Field(
+        default="All supplied releases were processed.",
+        min_length=1,
+        max_length=500,
+    )
+    query_start: datetime | None = None
+    query_end: datetime | None = None
+    max_amended_contracts: int | None = Field(default=None, ge=1, le=500)
+    amended_contracts_discovered: int = Field(default=0, ge=0)
+    amended_contracts_selected: int = Field(default=0, ge=0)
+    amended_contracts_skipped: int = Field(default=0, ge=0)
+
+
 class SourceManifest(BaseModel):
     """Reproducibility and quality metadata for one pipeline run."""
 
@@ -108,6 +127,7 @@ class SourceManifest(BaseModel):
     source_urls: list[str]
     source_license: str
     source_publisher: str
+    coverage: CollectionCoverage = Field(default_factory=CollectionCoverage)
     pages_fetched: int = 0
     releases_received: int
     releases_normalised: int
@@ -134,3 +154,24 @@ class PipelineResult(BaseModel):
     events_total: int
     validation_failures: int
     manifest_path: str
+
+
+class BackfillCheckpoint(BaseModel):
+    """Resumable progress and cumulative coverage for a historical collection."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal["1.0"] = "1.0"
+    start_date: date
+    end_date: date
+    window_days: int = Field(ge=1, le=31)
+    max_amended_contracts: int = Field(ge=1, le=500)
+    next_window_start: date
+    completed_through: date | None = None
+    completed_windows: int = Field(default=0, ge=0)
+    status: Literal["in_progress", "complete"] = "in_progress"
+    amended_contracts_discovered: int = Field(default=0, ge=0)
+    amended_contracts_selected: int = Field(default=0, ge=0)
+    amended_contracts_skipped: int = Field(default=0, ge=0)
+    change_events_added: int = Field(default=0, ge=0)
+    updated_at: datetime

@@ -16,24 +16,35 @@ in a report.
 
 ContractDelta is a static public-data application. The production site has no authentication,
 cookies, user accounts, database, or server-side request path. Scheduled ingestion runs in
-GitHub Actions with read access to the public AusTender API and write access only to the
-repository contents required for derived data updates.
+GitHub Actions with read access to the public AusTender API, write access to non-identifying
+public update status, and a repository-scoped deploy key for the separate private data
+repository.
 
 The source client accepts pagination links only from `https://api.tenders.gov.au` and enforces
-bounded dates, pages, timeouts, and retries.
+bounded dates, pages, amendment selection, backfill windows, timeouts, and retries.
 
 Source text is rendered through Astro's escaping boundary. CSV text that could be interpreted
 as a spreadsheet formula is prefixed safely, while the JSON evidence retains the exact
 normalised value. The site also applies a restrictive content policy and referrer policy.
 Every cross-origin link explicitly suppresses referrer information.
 
-The scheduled updater checks all distinct generated source destinations without following
-redirects or downloading response bodies. Definite missing-record responses stop the update.
-Access controls, rate limits, server errors, and network failures are reported as indeterminate
-so temporary source-side blocking does not masquerade as a broken record.
+Normalised names and descriptions pass a fail-closed scan for high-confidence email,
+business-identifier, Australian phone-number, and street-address patterns. Full state,
+immutable events, manifests, and checkpoints remain in a private repository. Generated site
+data exists only in the deployment runner and static artifact, not public Git history.
+
+The scheduled updater validates every distinct generated source path, then availability-checks
+up to 100 recent destinations without following redirects or downloading response bodies.
+Definite missing-record responses stop the update. Access controls, rate limits, server errors,
+and network failures are reported as indeterminate so temporary source-side blocking does not
+masquerade as a broken record.
 
 Workflow actions are pinned to immutable release commits. Dependabot monitors the workflow,
 Python, and npm ecosystems, while CI runs Python and npm vulnerability audits.
+
+The private deploy key must be unique to this project, stored only as the
+`PRIVATE_DATA_DEPLOY_KEY` repository secret, and granted access only to the private data
+repository. It must not be reused as a personal SSH key or broader account credential.
 
 ## Hosting limitations
 

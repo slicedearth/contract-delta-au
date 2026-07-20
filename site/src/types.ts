@@ -78,10 +78,27 @@ export interface Summary {
   reported_value: string;
 }
 
+export interface CollectionCoverage {
+  mode: "all_releases" | "bounded_amendments" | "fixture";
+  selection_method: string;
+  query_start: string | null;
+  query_end: string | null;
+  max_amended_contracts: number | null;
+  amended_contracts_discovered: number;
+  amended_contracts_selected: number;
+  amended_contracts_skipped: number;
+}
+
 export interface Dashboard {
   generated_at: string;
   latest_source_modified_at: string | null;
-  source: { name: string; publisher: string; license: string; adaptation_notice: string };
+  source: {
+    name: string;
+    publisher: string;
+    license: string;
+    adaptation_notice: string;
+    coverage: CollectionCoverage;
+  };
   disclaimer: string;
   stats: {
     changed_contracts: number;

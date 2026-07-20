@@ -5,11 +5,13 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from decimal import Decimal, InvalidOperation
 from typing import Any
 from urllib.parse import urlparse
 
 import httpx
 
+from contract_delta.models import CollectionCoverage
 from contract_delta.normalize import AUSTENDER_API
 
 
@@ -26,6 +28,28 @@ class FetchResult:
     pages_fetched: int = 0
     publisher: str = "Department of Finance"
     license_url: str = "https://creativecommons.org/licenses/by/3.0/au/"
+    query_start: datetime | None = None
+    query_end: datetime | None = None
+    selection_method: str = "All releases returned for the interval were processed."
+    max_amended_contracts: int | None = None
+    amended_contracts_discovered: int = 0
+    amended_contracts_selected: int = 0
+    amended_contracts_skipped: int = 0
+    amendments_only: bool = False
+
+    def coverage(self) -> CollectionCoverage:
+        """Return validated coverage metadata for publication and checkpoints."""
+
+        return CollectionCoverage(
+            mode="bounded_amendments" if self.amendments_only else "all_releases",
+            selection_method=self.selection_method,
+            query_start=self.query_start,
+            query_end=self.query_end,
+            max_amended_contracts=self.max_amended_contracts,
+            amended_contracts_discovered=self.amended_contracts_discovered,
+            amended_contracts_selected=self.amended_contracts_selected,
+            amended_contracts_skipped=self.amended_contracts_skipped,
+        )
 
 
 class AusTenderClient:
@@ -115,6 +139,8 @@ class AusTenderClient:
         end: datetime,
         *,
         hydrate_amendments: bool = True,
+        amendments_only: bool = False,
+        max_amended_contracts: int | None = None,
     ) -> FetchResult:
         """Fetch releases modified in a bounded interval and follow all cursor pages."""
 
@@ -122,13 +148,22 @@ class AusTenderClient:
             raise ValueError("end must be after start")
         if (end - start).days > 31:
             raise ValueError("date range cannot exceed 31 days")
+        if max_amended_contracts is not None:
+            if not amendments_only:
+                raise ValueError("max_amended_contracts requires amendments_only")
+            if not 1 <= max_amended_contracts <= 500:
+                raise ValueError("max_amended_contracts must be between 1 and 500")
 
         start_text = self._iso(start)
         end_text = self._iso(end)
         next_url = (
             f"{AUSTENDER_API}/ocds/findByDates/contractLastModified/{start_text}/{end_text}"
         )
-        result = FetchResult()
+        result = FetchResult(
+            query_start=start,
+            query_end=end,
+            amendments_only=amendments_only,
+        )
 
         for _ in range(self.max_pages):
             self._validate_next_url(next_url)
@@ -149,20 +184,116 @@ class AusTenderClient:
         else:
             raise SourceAPIError(f"pagination exceeded the safety limit of {self.max_pages} pages")
 
+        selected_releases, selected_ids = self._select_amendment_releases(
+            result.releases,
+            maximum=max_amended_contracts,
+        )
+        result.amended_contracts_discovered = len(
+            self._amendment_contract_ids(result.releases)
+        )
+        result.amended_contracts_selected = len(selected_ids)
+        result.amended_contracts_skipped = (
+            result.amended_contracts_discovered - result.amended_contracts_selected
+        )
+
+        if amendments_only:
+            result.releases = selected_releases
+            result.max_amended_contracts = max_amended_contracts
+            result.selection_method = (
+                "Explicit amendment contracts were ranked by current reported value, then "
+                "source modification time and contract ID. Only the highest-ranked bounded "
+                "set was processed."
+            )
         if hydrate_amendments:
-            result = self._hydrate_amendment_histories(result)
+            result = self._hydrate_amendment_histories(result, selected_ids)
         return result
 
-    def _hydrate_amendment_histories(self, result: FetchResult) -> FetchResult:
+    @staticmethod
+    def _amendment_contract_ids(releases: list[dict[str, Any]]) -> set[str]:
         contract_ids: set[str] = set()
-        for release in result.releases:
+        for release in releases:
             if "contractAmendment" not in (release.get("tag") or []):
                 continue
             contracts = release.get("contracts") or []
             if contracts and isinstance(contracts[0], dict):
                 contract_id = contracts[0].get("id")
-                if isinstance(contract_id, str):
+                if (
+                    isinstance(contract_id, str)
+                    and contract_id.startswith("CN")
+                    and contract_id[2:].isdigit()
+                ):
                     contract_ids.add(contract_id)
+        return contract_ids
+
+    @staticmethod
+    def _candidate_reported_value(release: dict[str, Any]) -> Decimal:
+        contracts = release.get("contracts") or []
+        contract = contracts[0] if contracts and isinstance(contracts[0], dict) else {}
+        amount = (contract.get("value") or {}).get("amount")
+        try:
+            return (
+                Decimal(str(amount).replace("$", "").replace(",", "").strip())
+                if amount is not None
+                else Decimal("-1")
+            )
+        except InvalidOperation:
+            return Decimal("-1")
+
+    @staticmethod
+    def _candidate_latest_rank(release: dict[str, Any]) -> tuple[Any, ...]:
+        contracts = release.get("contracts") or []
+        contract = contracts[0] if contracts and isinstance(contracts[0], dict) else {}
+        amendments = contract.get("amendments") or []
+        notice_id = str(amendments[0].get("id") or "") if amendments else ""
+        suffix = notice_id.rpartition("-A")[2]
+        amendment_number = int(suffix) if suffix.isdigit() else 0
+        source_date = str(release.get("date") or "")
+        release_id = str(release.get("id") or "")
+        return amendment_number, source_date, release_id
+
+    @classmethod
+    def _candidate_selection_rank(
+        cls,
+        release: dict[str, Any],
+        contract_id: str,
+    ) -> tuple[Any, ...]:
+        source_date = str(release.get("date") or "")
+        release_id = str(release.get("id") or "")
+        return cls._candidate_reported_value(release), source_date, contract_id, release_id
+
+    def _select_amendment_releases(
+        self,
+        releases: list[dict[str, Any]],
+        *,
+        maximum: int | None,
+    ) -> tuple[list[dict[str, Any]], set[str]]:
+        latest_by_contract: dict[str, dict[str, Any]] = {}
+        for release in releases:
+            contract_ids = self._amendment_contract_ids([release])
+            if not contract_ids:
+                continue
+            contract_id = next(iter(contract_ids))
+            current = latest_by_contract.get(contract_id)
+            if current is None or self._candidate_latest_rank(
+                release
+            ) > self._candidate_latest_rank(current):
+                latest_by_contract[contract_id] = release
+
+        ranked = sorted(
+            latest_by_contract.items(),
+            key=lambda item: self._candidate_selection_rank(item[1], item[0]),
+            reverse=True,
+        )
+        if maximum is not None:
+            ranked = ranked[:maximum]
+        selected_ids = {contract_id for contract_id, _ in ranked}
+        return [release for _, release in ranked], selected_ids
+
+    def _hydrate_amendment_histories(
+        self,
+        result: FetchResult,
+        contract_ids: set[str],
+    ) -> FetchResult:
 
         for contract_id in sorted(contract_ids):
             package = self.find_by_id(contract_id)

@@ -23,9 +23,9 @@ ContractDelta meets that publication model by:
 - stopping automated publication if the reported source publisher or licence changes
 
 The top-level MIT Licence applies to original application code and project documentation. It
-does not relicense AusTender-derived records in `data/`, `site/src/data/`,
-`site/public/data/`, `site/public/evidence/`, or the public fixtures. Those materials remain
-subject to the source CC BY 3.0 AU licence and the attribution in `NOTICE`.
+does not relicense AusTender-derived records in the private data repository, generated
+deployment artifacts, or public fixtures. Those materials remain subject to the source CC BY
+3.0 AU licence and the attribution in `NOTICE`.
 
 ## Privacy and data minimisation
 
@@ -38,7 +38,13 @@ reasonable expectations.
 ContractDelta retains agency and supplier names because they are necessary to analyse public
 contracts. A supplier name can identify a sole trader or other individual. The pipeline
 therefore excludes contact names, phone numbers, email addresses, ABNs, and street and postal
-addresses, and it does not enrich records with data from other sources.
+addresses, and it does not enrich records with data from other sources. A fail-closed scan
+also prevents high-confidence contact, labelled business-identifier, phone-number, and
+street-address patterns from entering durable state or a deployment artifact.
+
+Full state and history remain in a private repository. Public deployment artifacts still make
+the selected contract facts available to site visitors, so repository separation is a
+retention and access-control safeguard rather than de-identification.
 
 Do not place sensitive details in a public issue. Use GitHub's private vulnerability reporting
 channel for a sensitive security or privacy report. A source correction should be checked

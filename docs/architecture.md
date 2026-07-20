@@ -6,35 +6,44 @@ always-running service.
 ## Components
 
 1. `AusTenderClient` retrieves latest-modified OCDS release packages, follows same-origin
-   cursor links, and hydrates a parent history for each amendment.
+   cursor links, ranks explicit amendment contracts deterministically, and hydrates parent
+   history for a bounded selected set.
 2. `normalise_release` reduces each source release to analysis fields and removes contact and
    address data.
 3. `compare_versions` is a pure function that creates deterministic field-level events.
-4. `process_releases` merges validated versions without allowing old releases to roll current
-   state backwards.
+4. `process_releases` merges validated versions in a private data checkout without allowing old
+   releases to roll current state backwards.
 5. `build_site_data` creates compact dashboard JSON, per-contract evidence JSON, and a CSV
    event export.
-6. Astro renders static pages. Browser JavaScript is limited to filtering and client-side CSV
-   export of already-public data.
-7. The scheduled update checks bounded, validated source destinations and fails on definite
-   missing-record responses.
+6. Astro renders static pages from temporary generated assets. The change feed is divided into
+   50-event static pages so every published event remains reachable. Browser JavaScript is
+   limited to page-local filtering and client-side CSV export of already-public data.
+7. The scheduled update validates every published source path, availability-checks a bounded
+   recent sample, and fails on definite missing-record responses.
+8. The historical workflow processes limited date windows and records an atomic checkpoint
+   after each successful window.
+9. A repository-scoped deploy key connects the public workflow to the private data repository.
+   Generated dashboard and evidence files exist in the runner and deployment artifact only.
 
 ## Trust boundaries
 
 - AusTender JSON is untrusted input and validated before publication.
 - Pagination URLs must use HTTPS, the `api.tenders.gov.au` host, and the expected path.
-- Date ranges, pagination, retries, and timeouts are bounded.
+- Date ranges, pagination, amendment selection, backfill windows, retries, and timeouts are
+  bounded.
 - Source records are never rendered directly as HTML.
 - Published cross-origin links suppress referrer information.
-- Deployment contains no secrets and no server runtime.
+- Deployment contains no server runtime. Workflow access uses one scoped deploy-key secret;
+  the built site contains no credential.
 
 ## State and evidence
 
-`data/state/current-contracts.json` retains privacy-minimised versions and source release IDs.
-`data/events/change-events.json` is append-only in normal operation. The manifest records
-counts, validation failures, retrieval time, parser version, source URLs, and hashes of both
-files.
+The private repository's `data/state/current-contracts.json` retains privacy-minimised versions
+and source release IDs. `data/events/change-events.json` is append-only in normal operation.
+The manifest records counts, selection coverage, validation failures, retrieval time, parser
+version, source URLs, and hashes of both files. Historical checkpoints record cumulative
+discovered, selected, skipped, and added-event counts without claiming exhaustive collection.
 
 Static evidence bundles include the source release IDs, normalised hashes, before and after
-values, and the primary OCDS record URL. They are evidence aids, not replacements for the
-source.
+values, and the primary OCDS record URL. They are generated for each deployment and do not
+enter public Git history. They are evidence aids, not replacements for the source.

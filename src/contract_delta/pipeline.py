@@ -17,6 +17,7 @@ from contract_delta import __version__
 from contract_delta.diff import compare_versions
 from contract_delta.models import (
     ChangeEvent,
+    CollectionCoverage,
     ContractState,
     ContractVersion,
     PipelineResult,
@@ -29,6 +30,7 @@ from contract_delta.normalize import (
     official_record_url,
     version_sort_key,
 )
+from contract_delta.privacy import privacy_findings
 
 SOURCE_LICENSE = "https://creativecommons.org/licenses/by/3.0/au/"
 SOURCE_PUBLISHER = "Australian Government Department of Finance"
@@ -104,6 +106,18 @@ def _load_state(path: Path) -> dict[str, ContractState]:
 
 def _load_events(path: Path) -> list[ChangeEvent]:
     return [ChangeEvent.model_validate(value) for value in _load_json(path, [])]
+
+
+def _audit_state_privacy(state: dict[str, ContractState]) -> None:
+    for record in state.values():
+        for version in record.versions:
+            findings = privacy_findings(version)
+            if findings:
+                fields = ", ".join(sorted({finding.field_name for finding in findings}))
+                raise DataQualityError(
+                    f"privacy scan found contact or address markers in {fields}; "
+                    "publication stopped"
+                )
 
 
 def _direction(event: ChangeEvent) -> str:
@@ -255,6 +269,7 @@ def build_site_data(
     root: Path,
     source_license: str = SOURCE_LICENSE,
     source_publisher: str = SOURCE_PUBLISHER,
+    coverage: CollectionCoverage | None = None,
 ) -> dict[str, Any]:
     """Generate the compact dashboard, evidence JSON, and CSV exports."""
 
@@ -262,6 +277,7 @@ def build_site_data(
         source_license,
         source_publisher,
     )
+    coverage = coverage or CollectionCoverage()
 
     events_by_contract: dict[str, list[ChangeEvent]] = defaultdict(list)
     for event in events:
@@ -345,6 +361,7 @@ def build_site_data(
             "publisher": source_publisher,
             "license": source_license,
             "adaptation_notice": ADAPTATION_NOTICE,
+            "coverage": coverage.model_dump(mode="json"),
         },
         "disclaimer": DISCLAIMER,
         "stats": {
@@ -416,22 +433,26 @@ def process_releases(
     releases: list[dict[str, Any]],
     *,
     root: Path,
+    data_root: Path | None = None,
     source_urls: list[str] | None = None,
     pages_fetched: int = 0,
     source_license: str = SOURCE_LICENSE,
     source_publisher: str = SOURCE_PUBLISHER,
     retrieved_at: datetime | None = None,
+    coverage: CollectionCoverage | None = None,
 ) -> PipelineResult:
     """Normalise releases, update history, append events, and rebuild site assets."""
 
     retrieved_at = retrieved_at or datetime.now(UTC)
+    data_root = data_root or root
+    coverage = coverage or CollectionCoverage()
     source_license, source_publisher = _validated_source_attribution(
         source_license,
         source_publisher,
     )
-    state_path = root / "data/state/current-contracts.json"
-    events_path = root / "data/events/change-events.json"
-    manifest_path = root / "data/manifests/source-manifest.json"
+    state_path = data_root / "data/state/current-contracts.json"
+    events_path = data_root / "data/events/change-events.json"
+    manifest_path = data_root / "data/manifests/source-manifest.json"
     state = _load_state(state_path)
     events = _load_events(events_path)
     existing_event_ids = {event.event_id for event in events}
@@ -452,7 +473,17 @@ def process_releases(
     failures: list[dict[str, Any]] = []
     for release in [*unique_releases.values(), *anonymous_releases]:
         try:
-            versions.append(normalise_release(release))
+            version = normalise_release(release)
+            findings = privacy_findings(version)
+            if findings:
+                fields = ", ".join(sorted({finding.field_name for finding in findings}))
+                raise DataQualityError(
+                    f"privacy scan found contact or address markers in {fields}; "
+                    "publication stopped"
+                )
+            versions.append(version)
+        except DataQualityError:
+            raise
         except (NormalisationError, ValidationError, TypeError, KeyError) as exc:
             failures.append(
                 {
@@ -543,6 +574,7 @@ def process_releases(
         root=root,
         source_license=source_license,
         source_publisher=source_publisher,
+        coverage=coverage,
     )
 
     latest_modified = max((version.source_modified_at for version in versions), default=None)
@@ -552,6 +584,7 @@ def process_releases(
         source_urls=sorted(set(source_urls or [])),
         source_license=source_license or SOURCE_LICENSE,
         source_publisher=source_publisher or SOURCE_PUBLISHER,
+        coverage=coverage,
         pages_fetched=pages_fetched,
         releases_received=received_count,
         releases_normalised=len(versions),
@@ -577,14 +610,43 @@ def process_releases(
     )
 
 
-def rebuild_site(root: Path) -> dict[str, Any]:
+def rebuild_site(root: Path, *, data_root: Path | None = None) -> dict[str, Any]:
     """Recreate static assets from already-validated state and events."""
 
-    manifest = _load_json(root / "data/manifests/source-manifest.json", {})
+    data_root = data_root or root
+    manifest = _load_json(data_root / "data/manifests/source-manifest.json", {})
+    coverage = CollectionCoverage.model_validate(manifest.get("coverage") or {})
+    state = _load_state(data_root / "data/state/current-contracts.json")
+    _audit_state_privacy(state)
     return build_site_data(
-        _load_state(root / "data/state/current-contracts.json"),
-        _load_events(root / "data/events/change-events.json"),
+        state,
+        _load_events(data_root / "data/events/change-events.json"),
         root=root,
         source_license=str(manifest.get("source_license") or SOURCE_LICENSE),
         source_publisher=str(manifest.get("source_publisher") or SOURCE_PUBLISHER),
+        coverage=coverage,
     )
+
+
+def write_public_status(
+    root: Path,
+    *,
+    data_root: Path | None = None,
+    data_revision: str | None = None,
+) -> dict[str, Any]:
+    """Publish non-identifying update metadata that can safely remain in public history."""
+
+    data_root = data_root or root
+    manifest_path = data_root / "data/manifests/source-manifest.json"
+    manifest = SourceManifest.model_validate(_load_json(manifest_path, {}))
+    status = {
+        "schema_version": "1.0",
+        "retrieved_at": manifest.retrieved_at,
+        "latest_source_modified_at": manifest.latest_source_modified_at,
+        "contracts_in_private_state": manifest.contracts_in_state,
+        "change_events_in_private_state": manifest.change_events_total,
+        "coverage": manifest.coverage.model_dump(mode="json"),
+        "data_revision": data_revision,
+    }
+    _write_json(root / "site/src/data/update-status.json", status)
+    return status

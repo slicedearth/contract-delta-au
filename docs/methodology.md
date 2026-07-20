@@ -12,6 +12,21 @@ ContractDelta separates four layers:
 
 The application does not calculate a corruption, fraud, risk, or suspicion score.
 
+## Collection coverage
+
+Each source interval identifies contracts tagged as explicit amendments. ContractDelta keeps
+the latest candidate per contract, ranks candidates by current reported value, and uses source
+modification time, contract ID, and release ID as deterministic tie-breakers. Only the highest
+ranked configured number is hydrated and processed.
+
+The source manifest and public data page report the interval, selection method, cap, and
+discovered, selected, and skipped contract counts. Skipped contracts are outside the
+collection boundary. Their omission is not evidence that they were unchanged or unimportant.
+
+Historical collection uses inclusive date ranges of no more than 366 days. It divides a range
+into bounded windows and writes a checkpoint after each successful window so work can resume
+without silently skipping a failed interval.
+
 ## Version order
 
 AusTender parent notices use identifiers such as `CN123456`. Amendments use explicit suffixes
@@ -28,6 +43,8 @@ timestamp and release ID provide deterministic tie-breakers.
 - empty values become null
 - party letter case is preserved
 - only the primary contract and primary UNSPSC classification are analysed
+- retained text is checked for high-confidence email, labelled business-identifier, Australian
+  phone-number, and street-address patterns before publication
 
 Formatting-only changes do not produce events. Null-to-value and value-to-null transitions do.
 
@@ -65,14 +82,21 @@ Published events distinguish the human-readable official Contract Notice from th
 machine-readable OCDS JSON source. When the source does not expose a valid page identifier,
 the official-record link falls back to an AusTender search for the parent CN ID.
 
-The weekly update checks every distinct published official-record and OCDS JSON destination.
-Destinations outside the validated source paths fail before any request. For source responses,
-only a definite `404` or `410` is treated as broken. Redirects, access controls, rate limits,
-server errors, and network failures are recorded as indeterminate because they do not prove
-that a public record is missing.
+Every distinct published official-record and OCDS JSON path is validated. Destinations outside
+the approved source paths fail before any request, including paths beyond the availability
+sample. The weekly update checks up to 100 recent destinations. For source responses, only a
+definite `404` or `410` is treated as broken. Redirects, access controls, rate limits, server
+errors, and network failures are recorded as indeterminate because they do not prove that a
+public record is missing.
 
 CSV exports neutralise text that spreadsheet applications could otherwise interpret as a
 formula. JSON evidence preserves the exact normalised text.
+
+Durable state, immutable events, manifests, and backfill checkpoints are stored in a private
+repository. Public JSON, CSV, and per-contract evidence files are generated only for the
+static deployment artifact and are not committed to public Git history. This limits
+historical persistence in source control, but it does not make information displayed by the
+public site private.
 
 ## Limitations
 
@@ -82,5 +106,6 @@ formula. JSON evidence preserves the exact normalised text.
 - Supplier naming is source-reported and may change without a legal-entity change.
 - Category codes describe a primary classification, not every good or service supplied.
 - A source record and surrounding procurement documentation remain necessary for context.
+- Collection is capped per interval and favours contracts with higher current reported values.
 - Supplier names can identify sole traders or other individuals even when contact fields are
   excluded; do not enrich or republish unnecessary personal information.

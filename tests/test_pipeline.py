@@ -6,14 +6,33 @@ from pathlib import Path
 
 import pytest
 
-from contract_delta.pipeline import DataQualityError, _csv_safe, process_releases
+from contract_delta.models import CollectionCoverage
+from contract_delta.pipeline import (
+    DataQualityError,
+    _csv_safe,
+    process_releases,
+    write_public_status,
+)
 
 
 def test_pipeline_builds_idempotent_evidence_assets(
     tmp_path: Path,
     fixture_releases: list[dict],
 ) -> None:
-    first = process_releases(fixture_releases, root=tmp_path, source_urls=["fixture"])
+    coverage = CollectionCoverage(
+        mode="bounded_amendments",
+        selection_method="Test selection.",
+        max_amended_contracts=4,
+        amended_contracts_discovered=10,
+        amended_contracts_selected=4,
+        amended_contracts_skipped=6,
+    )
+    first = process_releases(
+        fixture_releases,
+        root=tmp_path,
+        source_urls=["fixture"],
+        coverage=coverage,
+    )
 
     state_path = tmp_path / "data/state/current-contracts.json"
     legacy_state = json.loads(state_path.read_text(encoding="utf-8"))
@@ -22,7 +41,12 @@ def test_pipeline_builds_idempotent_evidence_assets(
             version.pop("official_record_url")
     state_path.write_text(json.dumps(legacy_state), encoding="utf-8")
 
-    second = process_releases(fixture_releases, root=tmp_path, source_urls=["fixture"])
+    second = process_releases(
+        fixture_releases,
+        root=tmp_path,
+        source_urls=["fixture"],
+        coverage=coverage,
+    )
 
     assert first.contracts_in_state == 4
     assert first.events_added == 5
@@ -39,6 +63,8 @@ def test_pipeline_builds_idempotent_evidence_assets(
         "changed_contracts": 4,
         "current_reported_value": "2967417.36",
     }
+    assert dashboard["source"]["coverage"]["mode"] == "bounded_amendments"
+    assert dashboard["source"]["coverage"]["amended_contracts_skipped"] == 6
     assert (tmp_path / "site/public/evidence/CN4175467.json").exists()
     csv_text = (tmp_path / "site/public/data/change-events.csv").read_text(encoding="utf-8")
     assert "source_publisher,source_license,adaptation_notice" in csv_text.splitlines()[0]
@@ -78,6 +104,34 @@ def test_out_of_order_versions_do_not_roll_back_state(
     assert state["CN4260041"]["versions"][-1]["notice_id"] == "CN4260041-A1"
 
 
+def test_pipeline_separates_private_state_from_public_build_outputs(
+    tmp_path: Path,
+    fixture_releases: list[dict],
+) -> None:
+    public_root = tmp_path / "public"
+    private_root = tmp_path / "private"
+
+    process_releases(
+        fixture_releases,
+        root=public_root,
+        data_root=private_root,
+    )
+    status = write_public_status(
+        public_root,
+        data_root=private_root,
+        data_revision="abc123",
+    )
+
+    assert (private_root / "data/state/current-contracts.json").exists()
+    assert (private_root / "data/events/change-events.json").exists()
+    assert (private_root / "data/manifests/source-manifest.json").exists()
+    assert not (public_root / "data/state/current-contracts.json").exists()
+    assert (public_root / "site/src/data/dashboard.json").exists()
+    assert (public_root / "site/src/data/update-status.json").exists()
+    assert status["data_revision"] == "abc123"
+    assert status["contracts_in_private_state"] == 4
+
+
 def test_quality_threshold_stops_publication(tmp_path: Path) -> None:
     bad_release = {"id": "broken", "date": "not-a-date"}
     with pytest.raises(DataQualityError, match="publication stopped"):
@@ -108,6 +162,36 @@ def test_source_publisher_change_stops_publication(
             root=tmp_path,
             source_publisher="Unknown publisher",
         )
+
+
+@pytest.mark.parametrize(
+    ("field_name", "value"),
+    [
+        ("description", "Contact records@example.net for the service."),
+        ("description", "Delivery to 42 Example Street, Canberra."),
+        ("description", "Call 02 1234 5678 for details."),
+        ("supplier_name", "Example Supplier ABN 12 345 678 901"),
+    ],
+)
+def test_privacy_markers_stop_publication(
+    tmp_path: Path,
+    fixture_releases: list[dict],
+    field_name: str,
+    value: str,
+) -> None:
+    release = deepcopy(fixture_releases[0])
+    if field_name == "description":
+        release["contracts"][0]["description"] = value
+    else:
+        supplier = next(
+            party for party in release["parties"] if "supplier" in party.get("roles", [])
+        )
+        supplier["name"] = value
+
+    with pytest.raises(DataQualityError, match="privacy scan"):
+        process_releases([release], root=tmp_path)
+
+    assert not (tmp_path / "data/state/current-contracts.json").exists()
 
 
 @pytest.mark.parametrize("value", ["=1+1", "+1", "-1", "@SUM(A1:A2)", "\tvalue"])

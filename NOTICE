@@ -11,11 +11,10 @@ normalising values and dates, calculating field-level differences, ordering rele
 and adding evidence hashes and explanatory text. These transformations are independent
 and are not official Department of Finance records or calculations.
 
-Files under `data/`, `tests/fixtures/`, `site/src/data/`, `site/public/data/`, and
-`site/public/evidence/` that contain AusTender-derived material remain subject to the
-source Creative Commons licence. They are not relicensed under the repository's MIT
-Licence. The MIT Licence applies to the original application source code and project
-documentation.
+Records in the private data repository, public fixtures, generated deployment data, and
+generated evidence bundles remain subject to the source Creative Commons licence. They are
+not relicensed under the repository's MIT Licence. The MIT Licence applies to the original
+application source code and project documentation.
 
 ContractDelta AU is an independent project and is not affiliated with or
 endorsed by the Australian Government.

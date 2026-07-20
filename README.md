@@ -42,16 +42,29 @@ normalise amounts, dates, whitespace, parties, categories, and notice IDs
 compare versions → append immutable field events → hash evidence
         │
         ▼
-generate static JSON, CSV, contract timelines, and Astro pages
+commit durable state to a private repository
+        │
+        ▼
+generate temporary JSON, CSV, contract timelines, and Astro pages
         │
         ▼
 GitHub Actions → GitHub Pages
 ```
 
-The pipeline follows the API's opaque cursor links with a strict same-origin check. When a
-date-range page contains an amendment, it fetches that contract's parent history so a new
-repository can still calculate the real before value. Contacts, email addresses, ABNs, and
-street addresses are deliberately excluded.
+The pipeline follows the API's opaque cursor links with a strict same-origin check. It ranks
+explicit amendment contracts by current reported value, then uses deterministic source-time
+and contract-ID tie-breakers to retain a bounded set. Each selected contract's parent history
+is fetched so a new repository can calculate the real before value. The dashboard publishes
+the latest discovered, selected, and skipped counts. This coverage is intentionally not
+exhaustive. Contacts, email addresses, ABNs, and street addresses are deliberately excluded.
+High-confidence contact, business-identifier, phone-number, and street-address patterns stop
+publication before data can enter private history or a deployment artifact.
+
+Full state, events, manifests, and checkpoints live in a separate private repository. The
+public repository retains source code, privacy-minimised fixtures, and non-identifying update
+counts. Production dashboard data and downloads are generated inside the deployment runner
+and are never committed to public Git history. The change feed uses 50-event static pages so
+every published event remains browsable without making any one page grow without bound.
 
 ## Local development
 
@@ -80,36 +93,75 @@ cd site && npm run check && npm run build
 Fetch a live latest-modified window:
 
 ```bash
-.venv/bin/contract-delta update --from 2026-07-14 --to 2026-07-15
+.venv/bin/contract-delta \
+  --data-root ../contract-delta-au-data \
+  update \
+  --from 2026-07-14 \
+  --to 2026-07-15
 ```
+
+Use the production coverage boundary explicitly:
+
+```bash
+.venv/bin/contract-delta \
+  --data-root ../contract-delta-au-data \
+  update \
+  --from 2026-07-14 \
+  --to 2026-07-15 \
+  --amendments-only \
+  --max-amended-contracts 20
+```
+
+Resume a bounded historical collection in seven-day windows:
+
+```bash
+.venv/bin/contract-delta \
+  --data-root ../contract-delta-au-data \
+  backfill \
+  --from 2025-07-20 \
+  --to 2026-07-19 \
+  --window-days 7 \
+  --max-windows 1 \
+  --max-amended-contracts 20
+```
+
+Backfill progress is written atomically under `data/manifests/` in the selected private data
+root. Re-running the same command continues from the next incomplete window. A range is
+limited to 366 inclusive days and each invocation processes at most 53 windows.
 
 Date ranges are capped at 31 days, pagination is capped at 250 pages by default, transient
 source failures are retried, and publication stops if validation failures exceed 2%.
-The weekly update checks every distinct published source destination. Definite `404` and `410`
-responses fail the run, while access controls, rate limits, server errors, and network failures
-are reported as indeterminate for manual review.
+Every distinct published source path is validated before a request. The weekly update then
+availability-checks up to 100 recent destinations. Definite `404` and `410` responses fail the
+run, while access controls, rate limits, server errors, and network failures are reported as
+indeterminate for manual review.
 
 ## Repository layout
 
 ```text
 src/contract_delta/       typed source client, normalisation, diff, and publication
 tests/                    behavioural tests and privacy-minimised public fixtures
-data/state/               current normalised contract history
-data/events/              immutable field-level events
-data/manifests/           retrieval, quality, count, and checksum evidence
 site/                     static Astro dashboard
 docs/                     architecture, methodology, ethics, and data definitions
 .github/workflows/        CI, scheduled updates, and Pages deployment
 ```
 
+The sibling private checkout contains `data/state/`, `data/events/`, and `data/manifests/`.
+`site/src/data/update-status.json` is the only production update record retained publicly; it
+contains counts, timestamps, coverage boundaries, and the corresponding private revision, but
+no contract, supplier, agency, description, or source-record content.
+
 ## Automation and cost
 
 The public repository uses standard GitHub-hosted Actions and GitHub Pages. No application
-server, database, account system, secret, or paid production API is required. The weekly
-updater also supports manual runs and commits only when derived data changes.
+server, database, account system, or paid production API is required. A repository-scoped
+deploy key is stored as an Actions secret and grants access only to the private data
+repository. The weekly updater also supports manual runs, commits durable data privately,
+and commits only non-identifying update status publicly.
 
 Expected recurring hosting cost: **$0** for a public repository using standard runners and
-the included static deployment.
+the included static deployment. Bounded collection keeps request volume, repository growth,
+and static build time predictable.
 
 Current runtime and dependency choices, including deliberate compatibility constraints, are
 recorded in [the dependency policy](docs/dependency-policy.md). Dependabot checks Python,

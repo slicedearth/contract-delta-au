@@ -564,6 +564,16 @@
   "latest_source_modified_at": "2026-07-15T04:56:06Z",
   "source": {
     "adaptation_notice": "Adapted and normalised by ContractDelta AU from AusTender Contract Notice data.",
+    "coverage": {
+      "amended_contracts_discovered": 0,
+      "amended_contracts_selected": 0,
+      "amended_contracts_skipped": 0,
+      "max_amended_contracts": null,
+      "mode": "fixture",
+      "query_end": null,
+      "query_start": null,
+      "selection_method": "All releases in the saved fixture were processed."
+    },
     "license": "https://creativecommons.org/licenses/by/3.0/au/",
     "name": "AusTender OCDS API",
     "publisher": "Australian Government Department of Finance"

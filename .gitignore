@@ -9,6 +9,14 @@ htmlcov/
 site/node_modules/
 site/dist/
 site/.astro/
+site/public/data/
+site/public/evidence/
+
+data/state/
+data/events/
+data/manifests/
+
+.private-data/
 
 .DS_Store
 .env

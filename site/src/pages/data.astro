@@ -6,6 +6,8 @@ import { formatDate, formatMoney } from "../lib/format";
 
 const dashboard = rawDashboard as Dashboard;
 const base = import.meta.env.BASE_URL;
+const coverage = dashboard.source.coverage;
+const boundedCoverage = coverage.mode === "bounded_amendments";
 ---
 
 <BaseLayout
@@ -91,6 +93,32 @@ const base = import.meta.env.BASE_URL;
         </table>
       </div>
     </section>
+  </section>
+
+  <section class="attribution-panel">
+    <div><span aria-hidden="true">◎</span><h2>Collection coverage</h2></div>
+    <div>
+      <p>{coverage.selection_method}</p>
+      {boundedCoverage && (
+        <>
+          <p>
+            The most recent interval ran from
+            {` ${formatDate(coverage.query_start?.slice(0, 10) ?? null)}`} to
+            {` ${formatDate(coverage.query_end?.slice(0, 10) ?? null)}`}. It selected
+            {` ${coverage.amended_contracts_selected}`} of
+            {` ${coverage.amended_contracts_discovered}`} amendment contracts and left
+            {` ${coverage.amended_contracts_skipped}`} outside the per-interval cap of
+            {` ${coverage.max_amended_contracts}`}.
+          </p>
+          <p>
+            Coverage is intentionally not exhaustive. An omitted contract is outside this
+            collection boundary; it is not evidence that the contract was unchanged or
+            unimportant.
+          </p>
+        </>
+      )}
+      <a class="text-link" href={`${base}methodology/#collection`}>Read the collection method →</a>
+    </div>
   </section>
 
   <section class="attribution-panel">

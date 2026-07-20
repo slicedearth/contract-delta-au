@@ -23,7 +23,7 @@ OCDS_RECORD_PATTERN = re.compile(
     r"^https://api\.tenders\.gov\.au/ocds/findById/CN\d+$"
 )
 SOURCE_URL_KEYS = frozenset({"official_record_url", "source_url"})
-MAX_SOURCE_LINKS = 500
+MAX_SOURCE_LINKS = 100
 
 
 class SourceLinkError(RuntimeError):
@@ -41,10 +41,31 @@ class SourceLinkResult:
 
 
 @dataclass(frozen=True, slots=True)
+class SourceLinkSelection:
+    """A recent deterministic sample after validating every published path."""
+
+    urls: tuple[str, ...]
+    discovered: int
+
+    @property
+    def omitted(self) -> int:
+        return self.discovered - len(self.urls)
+
+
+@dataclass(frozen=True, slots=True)
 class SourceLinkReport:
     """A deterministic summary of a bounded source-link check."""
 
     results: tuple[SourceLinkResult, ...]
+    discovered: int
+
+    @property
+    def checked(self) -> int:
+        return len(self.results)
+
+    @property
+    def omitted(self) -> int:
+        return self.discovered - self.checked
 
     @property
     def reachable(self) -> int:
@@ -59,36 +80,46 @@ class SourceLinkReport:
         return sum(result.outcome == "indeterminate" for result in self.results)
 
 
-def _collect_source_links(value: Any, links: set[str]) -> None:
+def _collect_source_links(value: Any, links: list[str], seen: set[str]) -> None:
     if isinstance(value, dict):
         for key, nested in value.items():
             if key in SOURCE_URL_KEYS:
                 if not isinstance(nested, str):
                     raise SourceLinkError(f"{key} must be a string")
-                links.add(nested)
+                if nested not in seen:
+                    links.append(nested)
+                    seen.add(nested)
             else:
-                _collect_source_links(nested, links)
+                _collect_source_links(nested, links, seen)
     elif isinstance(value, list):
         for nested in value:
-            _collect_source_links(nested, links)
+            _collect_source_links(nested, links, seen)
 
 
-def dashboard_source_links(path: Path, *, maximum: int = MAX_SOURCE_LINKS) -> list[str]:
-    """Read, deduplicate, and bound source URLs from generated dashboard data."""
+def dashboard_source_links(
+    path: Path,
+    *,
+    maximum: int = MAX_SOURCE_LINKS,
+) -> SourceLinkSelection:
+    """Validate all generated paths and return a recent bounded availability sample."""
+
+    if maximum < 1:
+        raise ValueError("maximum must be at least 1")
 
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         raise SourceLinkError(f"cannot read generated dashboard: {exc}") from exc
-    links: set[str] = set()
-    _collect_source_links(payload, links)
+    links: list[str] = []
+    _collect_source_links(payload, links, set())
     if not links:
         raise SourceLinkError("generated dashboard contains no source links")
-    if len(links) > maximum:
+    invalid = next((url for url in links if not _is_valid_source_url(url)), None)
+    if invalid is not None:
         raise SourceLinkError(
-            f"generated dashboard contains {len(links)} source links; safety limit is {maximum}"
+            f"generated dashboard contains a URL outside the approved source paths: {invalid}"
         )
-    return sorted(links)
+    return SourceLinkSelection(tuple(links[:maximum]), discovered=len(links))
 
 
 def _is_valid_source_url(url: str) -> bool:
@@ -144,10 +175,15 @@ def check_source_links(
         ThreadPoolExecutor(max_workers=max_workers) as executor,
     ):
         results = tuple(executor.map(lambda url: _check_one(client, url), urls))
-    return SourceLinkReport(tuple(sorted(results, key=lambda result: result.url)))
+    return SourceLinkReport(
+        tuple(sorted(results, key=lambda result: result.url)),
+        discovered=len(urls),
+    )
 
 
 def check_dashboard_source_links(path: Path) -> SourceLinkReport:
-    """Check every distinct source destination in a generated dashboard."""
+    """Check a recent sample after validating every distinct destination path."""
 
-    return check_source_links(dashboard_source_links(path))
+    selection = dashboard_source_links(path)
+    report = check_source_links(list(selection.urls))
+    return SourceLinkReport(report.results, discovered=selection.discovered)

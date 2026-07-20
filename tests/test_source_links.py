@@ -21,7 +21,7 @@ OCDS_OFFLINE = "https://api.tenders.gov.au/ocds/findById/CN654321"
 OCDS_REDIRECTED = "https://api.tenders.gov.au/ocds/findById/CN111111"
 
 
-def test_dashboard_source_links_are_deduplicated_and_sorted(tmp_path: Path) -> None:
+def test_dashboard_source_links_are_deduplicated_in_publication_order(tmp_path: Path) -> None:
     path = tmp_path / "dashboard.json"
     path.write_text(
         json.dumps(
@@ -35,17 +35,39 @@ def test_dashboard_source_links_are_deduplicated_and_sorted(tmp_path: Path) -> N
         encoding="utf-8",
     )
 
-    assert dashboard_source_links(path) == sorted([OFFICIAL_OK, OCDS_BLOCKED])
+    selection = dashboard_source_links(path)
+    assert selection.urls == (OFFICIAL_OK, OCDS_BLOCKED)
+    assert selection.discovered == 2
+    assert selection.omitted == 0
 
 
-def test_dashboard_source_links_reject_an_excessive_set(tmp_path: Path) -> None:
+def test_dashboard_source_links_bound_the_availability_sample(tmp_path: Path) -> None:
     path = tmp_path / "dashboard.json"
     path.write_text(
         json.dumps({"official_record_url": OFFICIAL_OK, "source_url": OCDS_BLOCKED}),
         encoding="utf-8",
     )
 
-    with pytest.raises(SourceLinkError, match="safety limit"):
+    selection = dashboard_source_links(path, maximum=1)
+
+    assert selection.urls == (OFFICIAL_OK,)
+    assert selection.discovered == 2
+    assert selection.omitted == 1
+
+
+def test_dashboard_source_links_validate_paths_outside_the_sample(tmp_path: Path) -> None:
+    path = tmp_path / "dashboard.json"
+    path.write_text(
+        json.dumps(
+            {
+                "official_record_url": OFFICIAL_OK,
+                "source_url": "https://example.com/unapproved",
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(SourceLinkError, match="outside the approved source paths"):
         dashboard_source_links(path, maximum=1)
 
 

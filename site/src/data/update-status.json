@@ -1,0 +1,18 @@
+{
+  "change_events_in_private_state": 1033,
+  "contracts_in_private_state": 104,
+  "coverage": {
+    "amended_contracts_discovered": 525,
+    "amended_contracts_selected": 100,
+    "amended_contracts_skipped": 425,
+    "max_amended_contracts": 100,
+    "mode": "bounded_amendments",
+    "query_end": "2025-07-26T23:59:59.999999Z",
+    "query_start": "2025-07-20T00:00:00Z",
+    "selection_method": "Explicit amendment contracts were ranked by current reported value, then source modification time and contract ID. Only the highest-ranked bounded set was processed."
+  },
+  "data_revision": "d2affadfd93bcb35f92a4c9e62ea9b2e06755729",
+  "latest_source_modified_at": "2025-07-25T05:22:27Z",
+  "retrieved_at": "2026-07-20T04:27:34.864069Z",
+  "schema_version": "1.0"
+}
