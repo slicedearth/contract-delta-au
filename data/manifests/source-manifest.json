@@ -1,8 +1,8 @@
 {
-  "change_events_added": 5,
+  "change_events_added": 0,
   "change_events_total": 5,
   "contracts_in_state": 4,
-  "duplicate_releases": 0,
+  "duplicate_releases": 9,
   "events_sha256": "01615f08ec05f3752d3b74768fd60071a72b830467fa0d98686052543c48c8ef",
   "ignored_out_of_order_releases": 0,
   "latest_source_modified_at": "2026-07-15T04:56:06Z",
@@ -10,9 +10,9 @@
   "parser_version": "0.1.0",
   "releases_normalised": 9,
   "releases_received": 9,
-  "retrieved_at": "2026-07-20T02:17:50.850195Z",
+  "retrieved_at": "2026-07-20T03:10:43.972838Z",
   "source_license": "https://creativecommons.org/licenses/by/3.0/au/",
-  "source_publisher": "Department of Finance",
+  "source_publisher": "Australian Government Department of Finance",
   "source_urls": [
     "https://api.tenders.gov.au/ocds/findById/CN4175467",
     "https://api.tenders.gov.au/ocds/findById/CN4255613",

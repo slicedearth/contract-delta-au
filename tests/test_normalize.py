@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from decimal import Decimal
 
 import pytest
+from pydantic import ValidationError
 
 from contract_delta.normalize import NormalisationError, clean_text, normalise_release, parse_amount
 
@@ -33,4 +35,12 @@ def test_formatting_helpers_collapse_non_substantive_differences() -> None:
 def test_missing_attribution_is_rejected(fixture_releases: list[dict]) -> None:
     release = fixture_releases[0] | {"parties": []}
     with pytest.raises(NormalisationError, match="party"):
+        normalise_release(release)
+
+
+def test_oversized_source_text_is_rejected(fixture_releases: list[dict]) -> None:
+    release = deepcopy(fixture_releases[0])
+    release["contracts"][0]["description"] = "x" * 20_001
+
+    with pytest.raises(ValidationError, match="description"):
         normalise_release(release)

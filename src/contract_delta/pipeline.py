@@ -31,6 +31,10 @@ from contract_delta.normalize import (
 
 SOURCE_LICENSE = "https://creativecommons.org/licenses/by/3.0/au/"
 SOURCE_PUBLISHER = "Australian Government Department of Finance"
+ALLOWED_SOURCE_PUBLISHERS = {"Department of Finance", SOURCE_PUBLISHER}
+ADAPTATION_NOTICE = (
+    "Adapted and normalised by ContractDelta AU from AusTender Contract Notice data."
+)
 DISCLAIMER = (
     "ContractDelta identifies changes in publicly reported procurement records. "
     "A change is not evidence of misconduct. Contract amendments can result from "
@@ -40,6 +44,24 @@ DISCLAIMER = (
 
 class DataQualityError(RuntimeError):
     """Raised before publication when source validation crosses a safety threshold."""
+
+
+def _validated_source_attribution(license_url: str, publisher: str) -> tuple[str, str]:
+    normalised_license = f"{str(license_url).strip().rstrip('/')}/"
+    if normalised_license != SOURCE_LICENSE:
+        raise DataQualityError("source licence changed; manual review is required")
+    normalised_publisher = " ".join(str(publisher).split())
+    if normalised_publisher not in ALLOWED_SOURCE_PUBLISHERS:
+        raise DataQualityError("source publisher changed; manual review is required")
+    return SOURCE_LICENSE, SOURCE_PUBLISHER
+
+
+def _csv_safe(value: Any) -> Any:
+    """Prevent source text from becoming a spreadsheet formula when CSV is opened."""
+
+    if isinstance(value, str) and value.startswith(("=", "+", "-", "@", "\t", "\r", "\n")):
+        return f"'{value}"
+    return value
 
 
 def _json_default(value: Any) -> Any:
@@ -132,15 +154,30 @@ def _plain_language(event: ChangeEvent, currency: str = "AUD") -> str:
     return f"{labels.get(field, field.replace('_', ' ').title())} changed."
 
 
-def _event_for_site(event: ChangeEvent, currency: str = "AUD") -> dict[str, Any]:
+def _event_for_site(
+    event: ChangeEvent,
+    currency: str = "AUD",
+    *,
+    source_license: str = SOURCE_LICENSE,
+    source_publisher: str = SOURCE_PUBLISHER,
+) -> dict[str, Any]:
     payload = event.model_dump(mode="json")
     payload["direction"] = _direction(event)
     payload["summary"] = _plain_language(event, currency)
     payload["field_label"] = event.field_name.replace("_", " ").title()
+    payload["source_license"] = source_license
+    payload["source_publisher"] = source_publisher
+    payload["adaptation_notice"] = ADAPTATION_NOTICE
     return payload
 
 
-def _contract_for_site(state: ContractState, events: list[ChangeEvent]) -> dict[str, Any]:
+def _contract_for_site(
+    state: ContractState,
+    events: list[ChangeEvent],
+    *,
+    source_license: str,
+    source_publisher: str,
+) -> dict[str, Any]:
     latest = state.latest
     first = state.versions[0]
     initial_value = first.reported_value
@@ -174,7 +211,15 @@ def _contract_for_site(state: ContractState, events: list[ChangeEvent]) -> dict[
         "source_url": latest.source_url,
         "evidence_path": f"evidence/{latest.contract_id}.json",
         "versions": [version.model_dump(mode="json") for version in state.versions],
-        "events": [_event_for_site(event, latest.currency) for event in events],
+        "events": [
+            _event_for_site(
+                event,
+                latest.currency,
+                source_license=source_license,
+                source_publisher=source_publisher,
+            )
+            for event in events
+        ],
     }
 
 
@@ -183,8 +228,15 @@ def build_site_data(
     events: list[ChangeEvent],
     *,
     root: Path,
+    source_license: str = SOURCE_LICENSE,
+    source_publisher: str = SOURCE_PUBLISHER,
 ) -> dict[str, Any]:
     """Generate the compact dashboard, evidence JSON, and CSV exports."""
+
+    source_license, source_publisher = _validated_source_attribution(
+        source_license,
+        source_publisher,
+    )
 
     events_by_contract: dict[str, list[ChangeEvent]] = defaultdict(list)
     for event in events:
@@ -199,7 +251,12 @@ def build_site_data(
         )
 
     contracts = [
-        _contract_for_site(state[contract_id], events_by_contract[contract_id])
+        _contract_for_site(
+            state[contract_id],
+            events_by_contract[contract_id],
+            source_license=source_license,
+            source_publisher=source_publisher,
+        )
         for contract_id in sorted(events_by_contract)
         if contract_id in state
     ]
@@ -211,7 +268,12 @@ def build_site_data(
         contract = contract_lookup.get(event.contract_id)
         if contract is None:
             continue
-        item = _event_for_site(event, contract["currency"])
+        item = _event_for_site(
+            event,
+            contract["currency"],
+            source_license=source_license,
+            source_publisher=source_publisher,
+        )
         item.update(
             {
                 "agency_name": contract["agency_name"],
@@ -257,8 +319,9 @@ def build_site_data(
         "latest_source_modified_at": latest_modified,
         "source": {
             "name": "AusTender OCDS API",
-            "publisher": SOURCE_PUBLISHER,
-            "license": SOURCE_LICENSE,
+            "publisher": source_publisher,
+            "license": source_license,
+            "adaptation_notice": ADAPTATION_NOTICE,
         },
         "disclaimer": DISCLAIMER,
         "stats": {
@@ -308,6 +371,9 @@ def build_site_data(
             "percentage_change",
             "duration_change_days",
             "source_url",
+            "source_publisher",
+            "source_license",
+            "adaptation_notice",
         ]
         writer = csv.DictWriter(
             handle,
@@ -316,7 +382,9 @@ def build_site_data(
             lineterminator="\n",
         )
         writer.writeheader()
-        writer.writerows(site_events)
+        writer.writerows(
+            {key: _csv_safe(value) for key, value in event.items()} for event in site_events
+        )
     return dashboard
 
 
@@ -333,6 +401,10 @@ def process_releases(
     """Normalise releases, update history, append events, and rebuild site assets."""
 
     retrieved_at = retrieved_at or datetime.now(UTC)
+    source_license, source_publisher = _validated_source_attribution(
+        source_license,
+        source_publisher,
+    )
     state_path = root / "data/state/current-contracts.json"
     events_path = root / "data/events/change-events.json"
     manifest_path = root / "data/manifests/source-manifest.json"
@@ -417,7 +489,13 @@ def process_releases(
     events_payload = [event.model_dump(mode="json") for event in events]
     state_bytes = _write_json(state_path, state_payload)
     events_bytes = _write_json(events_path, events_payload)
-    build_site_data(state, events, root=root)
+    build_site_data(
+        state,
+        events,
+        root=root,
+        source_license=source_license,
+        source_publisher=source_publisher,
+    )
 
     latest_modified = max((version.source_modified_at for version in versions), default=None)
     manifest = SourceManifest(
@@ -454,8 +532,11 @@ def process_releases(
 def rebuild_site(root: Path) -> dict[str, Any]:
     """Recreate static assets from already-validated state and events."""
 
+    manifest = _load_json(root / "data/manifests/source-manifest.json", {})
     return build_site_data(
         _load_state(root / "data/state/current-contracts.json"),
         _load_events(root / "data/events/change-events.json"),
         root=root,
+        source_license=str(manifest.get("source_license") or SOURCE_LICENSE),
+        source_publisher=str(manifest.get("source_publisher") or SOURCE_PUBLISHER),
     )

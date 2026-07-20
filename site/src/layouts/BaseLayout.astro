@@ -25,6 +25,11 @@ const imageUrl = new URL(`${base}${image}`, Astro.site);
     <meta name="description" content={description} />
     <meta name="theme-color" content="#102725" />
     <meta name="color-scheme" content="light" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; base-uri 'self'; connect-src 'none'; font-src 'self'; form-action 'self'; frame-src 'none'; img-src 'self' data:; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests"
+    />
     <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
     <link rel="canonical" href={canonical} />
     <meta property="og:type" content="website" />
@@ -66,8 +71,9 @@ const imageUrl = new URL(`${base}${image}`, Astro.site);
         <a href="https://github.com/slicedearth/contract-delta-au">Source code ↗</a>
       </div>
       <p class="fine-print">
-        Not affiliated with or endorsed by the Australian Government. AusTender data is
-        attributed to the Department of Finance under CC BY 3.0 AU.
+        Not affiliated with or endorsed by the Australian Government. Adapted AusTender data is
+        attributed to the Department of Finance under
+        <a href="https://creativecommons.org/licenses/by/3.0/au/">CC BY 3.0 AU</a>.
       </p>
     </footer>
   </body>

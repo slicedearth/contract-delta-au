@@ -21,3 +21,17 @@ repository contents required for derived data updates.
 
 The source client accepts pagination links only from `https://api.tenders.gov.au` and enforces
 bounded dates, pages, timeouts, and retries.
+
+Source text is rendered through Astro's escaping boundary. CSV text that could be interpreted
+as a spreadsheet formula is prefixed safely, while the JSON evidence retains the exact
+normalised value. The site also applies a restrictive content policy and referrer policy.
+
+Workflow actions are pinned to immutable release commits. Dependabot monitors the workflow,
+Python, and npm ecosystems, while CI runs Python and npm vulnerability audits.
+
+## Hosting limitations
+
+GitHub Pages controls the HTTP response headers. The project therefore cannot set headers such
+as `X-Content-Type-Options` or `Permissions-Policy` at the hosting layer. A content security
+policy is supplied in the static document, but response-header enforcement would require a
+different static host.

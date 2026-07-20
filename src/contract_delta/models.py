@@ -16,18 +16,21 @@ class ContractVersion(BaseModel):
 
     contract_id: str = Field(pattern=r"^CN\d+$")
     notice_id: str = Field(pattern=r"^CN\d+(?:-A\d+)?$")
-    source_release_id: str
+    source_release_id: str = Field(min_length=1, max_length=256)
     source_modified_at: datetime
-    source_url: str
+    source_url: str = Field(
+        max_length=2048,
+        pattern=r"^https://api\.tenders\.gov\.au/ocds/findById/CN\d+$",
+    )
     source_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
-    agency_name: str
-    supplier_name: str
-    title: str | None = None
-    description: str
-    category_code: str | None = None
-    procurement_method: str | None = None
+    agency_name: str = Field(min_length=1, max_length=500)
+    supplier_name: str = Field(min_length=1, max_length=500)
+    title: str | None = Field(default=None, max_length=1000)
+    description: str = Field(min_length=1, max_length=20_000)
+    category_code: str | None = Field(default=None, max_length=100)
+    procurement_method: str | None = Field(default=None, max_length=500)
     reported_value: Decimal | None = None
-    currency: str = "AUD"
+    currency: str = Field(default="AUD", pattern=r"^[A-Za-z]{3}$")
     contract_start_date: date | None = None
     contract_end_date: date | None = None
 

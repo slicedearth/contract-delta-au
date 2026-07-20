@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from contract_delta.pipeline import DataQualityError, process_releases
+from contract_delta.pipeline import DataQualityError, _csv_safe, process_releases
 
 
 def test_pipeline_builds_idempotent_evidence_assets(
@@ -32,7 +32,15 @@ def test_pipeline_builds_idempotent_evidence_assets(
         "current_reported_value": "2967417.36",
     }
     assert (tmp_path / "site/public/evidence/CN4175467.json").exists()
-    assert (tmp_path / "site/public/data/change-events.csv").exists()
+    csv_text = (tmp_path / "site/public/data/change-events.csv").read_text(encoding="utf-8")
+    assert "source_publisher,source_license,adaptation_notice" in csv_text.splitlines()[0]
+
+    public_events = json.loads(
+        (tmp_path / "site/public/data/change-events.json").read_text(encoding="utf-8")
+    )
+    assert public_events[0]["source_publisher"] == "Australian Government Department of Finance"
+    assert public_events[0]["source_license"].endswith("/by/3.0/au/")
+    assert public_events[0]["adaptation_notice"].startswith("Adapted and normalised")
 
 
 def test_out_of_order_versions_do_not_roll_back_state(
@@ -57,3 +65,33 @@ def test_quality_threshold_stops_publication(tmp_path: Path) -> None:
     with pytest.raises(DataQualityError, match="publication stopped"):
         process_releases([bad_release], root=tmp_path)
     assert not (tmp_path / "data/state/current-contracts.json").exists()
+
+
+def test_source_licence_change_stops_publication(
+    tmp_path: Path,
+    fixture_releases: list[dict],
+) -> None:
+    with pytest.raises(DataQualityError, match="source licence changed"):
+        process_releases(
+            fixture_releases,
+            root=tmp_path,
+            source_license="https://example.com/unknown-licence",
+        )
+    assert not (tmp_path / "data/state/current-contracts.json").exists()
+
+
+def test_source_publisher_change_stops_publication(
+    tmp_path: Path,
+    fixture_releases: list[dict],
+) -> None:
+    with pytest.raises(DataQualityError, match="source publisher changed"):
+        process_releases(
+            fixture_releases,
+            root=tmp_path,
+            source_publisher="Unknown publisher",
+        )
+
+
+@pytest.mark.parametrize("value", ["=1+1", "+1", "-1", "@SUM(A1:A2)", "\tvalue"])
+def test_csv_cells_cannot_become_spreadsheet_formulas(value: str) -> None:
+    assert _csv_safe(value) == f"'{value}"

@@ -212,7 +212,8 @@ const fieldLabels = new Map(dashboard.events.map((event) => [event.field_name, e
         direction: card.dataset.direction ?? "",
         summary: card.querySelector(".change-summary")?.textContent?.trim() ?? ""
       }));
-      const escape = (value: string) => `"${value.replaceAll('"', '""')}"`;
+      const neutralise = (value: string) => /^[=+\-@\t\r\n]/.test(value) ? `'${value}` : value;
+      const escape = (value: string) => `"${neutralise(value).replaceAll('"', '""')}"`;
       const rows = ["contract_id,agency,field,direction,summary", ...visible.map((row) =>
         [row.contract_id, row.agency, row.field, row.direction, row.summary].map(escape).join(",")
       )];

@@ -12,6 +12,7 @@
     "events": [
       {
         "absolute_change": "50000.00",
+        "adaptation_notice": "Adapted and normalised by ContractDelta AU from AusTender Contract Notice data.",
         "after_release_id": "prod-ec6c2b76eedd4f54a3187ca0a9caf278-74c0d87a265231d6aef024b299a0eb07",
         "after_source_hash": "6e2ead1db6eab264d6bcc231cafc507b27a7016bbb8372ae5578b7250c31a566",
         "before_release_id": "prod-ec6c2b76eedd4f54a3187ca0a9caf278-9af03fc92ed7373fb750cf2e5c060076",
@@ -27,11 +28,14 @@
         "notice_id": "CN4175467-A1",
         "old_value": "75000.00",
         "percentage_change": "66.67",
+        "source_license": "https://creativecommons.org/licenses/by/3.0/au/",
+        "source_publisher": "Australian Government Department of Finance",
         "source_url": "https://api.tenders.gov.au/ocds/findById/CN4175467",
         "summary": "Reported contract value increased by $50,000.00 (+66.67%)."
       },
       {
         "absolute_change": "50000.00",
+        "adaptation_notice": "Adapted and normalised by ContractDelta AU from AusTender Contract Notice data.",
         "after_release_id": "prod-ec6c2b76eedd4f54a3187ca0a9caf278-d29b58ab2d6133d99a19e270fa03a0a3",
         "after_source_hash": "63545b681bb0dc0e820d30e7010e997cc9d93e98ceee90de8613ef1e2374aa35",
         "before_release_id": "prod-ec6c2b76eedd4f54a3187ca0a9caf278-74c0d87a265231d6aef024b299a0eb07",
@@ -47,6 +51,8 @@
         "notice_id": "CN4175467-A2",
         "old_value": "125000.00",
         "percentage_change": "40.00",
+        "source_license": "https://creativecommons.org/licenses/by/3.0/au/",
+        "source_publisher": "Australian Government Department of Finance",
         "source_url": "https://api.tenders.gov.au/ocds/findById/CN4175467",
         "summary": "Reported contract value increased by $50,000.00 (+40.00%)."
       }
@@ -122,6 +128,7 @@
   "generated_at": "2026-07-15T04:56:06Z",
   "schema_version": "1.0",
   "source": {
+    "adaptation_notice": "Adapted and normalised by ContractDelta AU from AusTender Contract Notice data.",
     "license": "https://creativecommons.org/licenses/by/3.0/au/",
     "name": "AusTender OCDS API",
     "publisher": "Australian Government Department of Finance"

@@ -1,6 +1,7 @@
 [
   {
     "absolute_change": "50000.00",
+    "adaptation_notice": "Adapted and normalised by ContractDelta AU from AusTender Contract Notice data.",
     "after_release_id": "prod-ec6c2b76eedd4f54a3187ca0a9caf278-74c0d87a265231d6aef024b299a0eb07",
     "after_source_hash": "6e2ead1db6eab264d6bcc231cafc507b27a7016bbb8372ae5578b7250c31a566",
     "agency_name": "Australian Bureau of Statistics",
@@ -18,12 +19,15 @@
     "notice_id": "CN4175467-A1",
     "old_value": "75000.00",
     "percentage_change": "66.67",
+    "source_license": "https://creativecommons.org/licenses/by/3.0/au/",
+    "source_publisher": "Australian Government Department of Finance",
     "source_url": "https://api.tenders.gov.au/ocds/findById/CN4175467",
     "summary": "Reported contract value increased by $50,000.00 (+66.67%).",
     "supplier_name": "Clayton Utz"
   },
   {
     "absolute_change": "50000.00",
+    "adaptation_notice": "Adapted and normalised by ContractDelta AU from AusTender Contract Notice data.",
     "after_release_id": "prod-ec6c2b76eedd4f54a3187ca0a9caf278-d29b58ab2d6133d99a19e270fa03a0a3",
     "after_source_hash": "63545b681bb0dc0e820d30e7010e997cc9d93e98ceee90de8613ef1e2374aa35",
     "agency_name": "Australian Bureau of Statistics",
@@ -41,12 +45,15 @@
     "notice_id": "CN4175467-A2",
     "old_value": "125000.00",
     "percentage_change": "40.00",
+    "source_license": "https://creativecommons.org/licenses/by/3.0/au/",
+    "source_publisher": "Australian Government Department of Finance",
     "source_url": "https://api.tenders.gov.au/ocds/findById/CN4175467",
     "summary": "Reported contract value increased by $50,000.00 (+40.00%).",
     "supplier_name": "Clayton Utz"
   },
   {
     "absolute_change": "31745.88",
+    "adaptation_notice": "Adapted and normalised by ContractDelta AU from AusTender Contract Notice data.",
     "after_release_id": "prod-0eb1223926e34116b9b43844c195a08b-74f777d1ceb93189830a023d9cedf631",
     "after_source_hash": "75b8670982b2d522b209dd183f38eefbb768ba67aed241b81a0418c55c499e86",
     "agency_name": "Department of the Senate",
@@ -64,12 +71,15 @@
     "notice_id": "CN4260041-A1",
     "old_value": "317458.84",
     "percentage_change": "10.00",
+    "source_license": "https://creativecommons.org/licenses/by/3.0/au/",
+    "source_publisher": "Australian Government Department of Finance",
     "source_url": "https://api.tenders.gov.au/ocds/findById/CN4260041",
     "summary": "Reported contract value increased by $31,745.88 (+10.00%).",
     "supplier_name": "Technology One"
   },
   {
     "absolute_change": null,
+    "adaptation_notice": "Adapted and normalised by ContractDelta AU from AusTender Contract Notice data.",
     "after_release_id": "prod-92cb8e4605464725990b1b6da445d61e-5002f6e466ce3ea682fdb5d62784d7ae",
     "after_source_hash": "588fbb984b4dad3720b8447b41d5c675ef39a11081b1d7c23456808a6066d3a3",
     "agency_name": "Department of Agriculture, Fisheries and Forestry",
@@ -87,12 +97,15 @@
     "notice_id": "CN4255613-A1",
     "old_value": "DAIRY FOOD SAFETY VICTORIA",
     "percentage_change": null,
+    "source_license": "https://creativecommons.org/licenses/by/3.0/au/",
+    "source_publisher": "Australian Government Department of Finance",
     "source_url": "https://api.tenders.gov.au/ocds/findById/CN4255613",
     "summary": "Supplier changed.",
     "supplier_name": "SAFE FOOD VICTORIA"
   },
   {
     "absolute_change": "-38775.00",
+    "adaptation_notice": "Adapted and normalised by ContractDelta AU from AusTender Contract Notice data.",
     "after_release_id": "prod-802aa9fb8a374412939898828ba4743a-578bd08b098535cba15afa34159c3744",
     "after_source_hash": "d1497eb061a83a9a01aa135e8d863d5c281c653323c189ff64ce18e028d3cab5",
     "agency_name": "Department of Defence",
@@ -110,6 +123,8 @@
     "notice_id": "CN4259878-A1",
     "old_value": "134420.00",
     "percentage_change": "-28.85",
+    "source_license": "https://creativecommons.org/licenses/by/3.0/au/",
+    "source_publisher": "Australian Government Department of Finance",
     "source_url": "https://api.tenders.gov.au/ocds/findById/CN4259878",
     "summary": "Reported contract value decreased by $38,775.00 (-28.85%).",
     "supplier_name": "HASKONING AUSTRALIA PTY LIMITED T/A ROYAL HASKONING"

@@ -34,6 +34,9 @@ export interface ChangeEvent {
   before_source_hash: string;
   after_source_hash: string;
   source_url: string;
+  source_license: string;
+  source_publisher: string;
+  adaptation_notice: string;
   direction: string;
   summary: string;
   agency_name?: string;
@@ -75,7 +78,7 @@ export interface Summary {
 export interface Dashboard {
   generated_at: string;
   latest_source_modified_at: string | null;
-  source: { name: string; publisher: string; license: string };
+  source: { name: string; publisher: string; license: string; adaptation_notice: string };
   disclaimer: string;
   stats: {
     changed_contracts: number;

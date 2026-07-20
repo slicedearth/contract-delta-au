@@ -23,6 +23,24 @@ def _root(value: str) -> Path:
     return Path(value).expanduser().resolve()
 
 
+def _bounded_integer(value: str, *, name: str, maximum: int) -> int:
+    try:
+        parsed = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(f"{name} must be an integer") from exc
+    if not 1 <= parsed <= maximum:
+        raise argparse.ArgumentTypeError(f"{name} must be between 1 and {maximum}")
+    return parsed
+
+
+def _lookback_days(value: str) -> int:
+    return _bounded_integer(value, name="lookback days", maximum=31)
+
+
+def _max_pages(value: str) -> int:
+    return _bounded_integer(value, name="max pages", maximum=250)
+
+
 def _read_fixture(path: Path) -> tuple[list[dict[str, Any]], list[str], str, str]:
     payload = json.loads(path.read_text(encoding="utf-8"))
     packages = payload if isinstance(payload, list) else [payload]
@@ -52,8 +70,8 @@ def build_parser() -> argparse.ArgumentParser:
     live = subparsers.add_parser("update", help="fetch a live latest-modified date range")
     live.add_argument("--from", dest="start", type=_date)
     live.add_argument("--to", dest="end", type=_date)
-    live.add_argument("--lookback-days", type=int, default=8)
-    live.add_argument("--max-pages", type=int, default=250)
+    live.add_argument("--lookback-days", type=_lookback_days, default=8)
+    live.add_argument("--max-pages", type=_max_pages, default=250)
     live.add_argument("--no-hydrate", action="store_true")
 
     fixture = subparsers.add_parser("ingest-fixture", help="process saved OCDS packages")

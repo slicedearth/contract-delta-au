@@ -12,6 +12,7 @@
     "events": [
       {
         "absolute_change": null,
+        "adaptation_notice": "Adapted and normalised by ContractDelta AU from AusTender Contract Notice data.",
         "after_release_id": "prod-92cb8e4605464725990b1b6da445d61e-5002f6e466ce3ea682fdb5d62784d7ae",
         "after_source_hash": "588fbb984b4dad3720b8447b41d5c675ef39a11081b1d7c23456808a6066d3a3",
         "before_release_id": "prod-92cb8e4605464725990b1b6da445d61e-886856a9ea9536efba9e03f1d91d028f",
@@ -27,6 +28,8 @@
         "notice_id": "CN4255613-A1",
         "old_value": "DAIRY FOOD SAFETY VICTORIA",
         "percentage_change": null,
+        "source_license": "https://creativecommons.org/licenses/by/3.0/au/",
+        "source_publisher": "Australian Government Department of Finance",
         "source_url": "https://api.tenders.gov.au/ocds/findById/CN4255613",
         "summary": "Supplier changed."
       }
@@ -84,6 +87,7 @@
   "generated_at": "2026-07-15T04:56:06Z",
   "schema_version": "1.0",
   "source": {
+    "adaptation_notice": "Adapted and normalised by ContractDelta AU from AusTender Contract Notice data.",
     "license": "https://creativecommons.org/licenses/by/3.0/au/",
     "name": "AusTender OCDS API",
     "publisher": "Australian Government Department of Finance"

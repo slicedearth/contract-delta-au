@@ -12,6 +12,7 @@
     "events": [
       {
         "absolute_change": "31745.88",
+        "adaptation_notice": "Adapted and normalised by ContractDelta AU from AusTender Contract Notice data.",
         "after_release_id": "prod-0eb1223926e34116b9b43844c195a08b-74f777d1ceb93189830a023d9cedf631",
         "after_source_hash": "75b8670982b2d522b209dd183f38eefbb768ba67aed241b81a0418c55c499e86",
         "before_release_id": "prod-0eb1223926e34116b9b43844c195a08b-95ba33e131a13e808a2f34a7209ea158",
@@ -27,6 +28,8 @@
         "notice_id": "CN4260041-A1",
         "old_value": "317458.84",
         "percentage_change": "10.00",
+        "source_license": "https://creativecommons.org/licenses/by/3.0/au/",
+        "source_publisher": "Australian Government Department of Finance",
         "source_url": "https://api.tenders.gov.au/ocds/findById/CN4260041",
         "summary": "Reported contract value increased by $31,745.88 (+10.00%)."
       }
@@ -84,6 +87,7 @@
   "generated_at": "2026-07-15T04:56:06Z",
   "schema_version": "1.0",
   "source": {
+    "adaptation_notice": "Adapted and normalised by ContractDelta AU from AusTender Contract Notice data.",
     "license": "https://creativecommons.org/licenses/by/3.0/au/",
     "name": "AusTender OCDS API",
     "publisher": "Australian Government Department of Finance"
