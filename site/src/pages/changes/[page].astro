@@ -1,0 +1,47 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ChangeFeed from "../../components/ChangeFeed.astro";
+import rawDashboard from "../../data/dashboard.json";
+import type { Dashboard } from "../../types";
+import { getChangePage, getChangePageCount } from "../../lib/pagination";
+
+interface Props {
+  page: number;
+}
+
+export function getStaticPaths() {
+  const dashboard = rawDashboard as Dashboard;
+  const totalPages = getChangePageCount(dashboard.events.length);
+
+  return Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) => {
+    const page = index + 2;
+    return { params: { page: String(page) }, props: { page } };
+  });
+}
+
+const dashboard = rawDashboard as Dashboard;
+const { page } = Astro.props;
+const totalPages = getChangePageCount(dashboard.events.length);
+const pageEvents = getChangePage(dashboard.events, page);
+---
+
+<BaseLayout
+  title={`Contract changes, page ${page} | ContractDelta AU`}
+  description={`Page ${page} of evidence-linked changes to Australian Government Contract Notices.`}
+>
+  <header class="page-hero change-page-hero">
+    <p class="eyebrow eyebrow--light"><span></span> Change feed</p>
+    <h1>Published changes,<br /><em>page {page}.</em></h1>
+    <p>
+      Browse every published change event across {totalPages} static pages. Filters operate on
+      the current page, while the complete CSV remains available for dataset-wide analysis.
+    </p>
+  </header>
+
+  <ChangeFeed
+    events={pageEvents}
+    totalEvents={dashboard.events.length}
+    currentPage={page}
+    totalPages={totalPages}
+  />
+</BaseLayout>

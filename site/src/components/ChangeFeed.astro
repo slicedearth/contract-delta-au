@@ -1,0 +1,162 @@
+---
+import ChangeCard from "./ChangeCard.astro";
+import type { ChangeEvent } from "../types";
+
+interface Props {
+  events: ChangeEvent[];
+  totalEvents: number;
+  currentPage: number;
+  totalPages: number;
+}
+
+const { events, totalEvents, currentPage, totalPages } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const agencies = [...new Set(events.map((event) => event.agency_name).filter(Boolean))].sort();
+const fields = [...new Set(events.map((event) => event.field_name))].sort();
+const fieldLabels = new Map(events.map((event) => [event.field_name, event.field_label]));
+const pageHref = (page: number) => page === 1
+  ? `${base}#changes`
+  : `${base}changes/${page}/#changes`;
+---
+
+<section class="content-section changes-section" id="changes" data-current-page={currentPage}>
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow"><span></span> Change feed</p>
+      <h2>What changed?</h2>
+      <p>
+        Every published comparison links back to the supporting source releases. Collection
+        is bounded and its latest interval counts are published on the data page.
+      </p>
+    </div>
+    <a class="download-link" href={`${base}data/change-events.csv`} download>Download published CSV ↓</a>
+  </div>
+
+  <form class="filters" data-filters aria-label="Filter contract changes on this page">
+    <label class="search-field">
+      <span>Search</span>
+      <div>
+        <span aria-hidden="true">⌕</span>
+        <input type="search" name="query" placeholder="Contract, agency, supplier…" autocomplete="off" />
+      </div>
+    </label>
+    <label>
+      <span>Agency</span>
+      <select name="agency">
+        <option value="">All agencies</option>
+        {agencies.map((agency) => <option value={agency}>{agency}</option>)}
+      </select>
+    </label>
+    <label>
+      <span>Field</span>
+      <select name="field">
+        <option value="">All fields</option>
+        {fields.map((field) => <option value={field}>{fieldLabels.get(field)}</option>)}
+      </select>
+    </label>
+    <label>
+      <span>Direction</span>
+      <select name="direction">
+        <option value="">Any direction</option>
+        <option value="increase">Increase</option>
+        <option value="decrease">Decrease</option>
+        <option value="extension">Extension</option>
+        <option value="reduction">Reduction</option>
+        <option value="changed">Other change</option>
+      </select>
+    </label>
+    <button class="reset-button" type="reset">Clear</button>
+  </form>
+
+  <div class="result-line">
+    <p aria-live="polite">
+      <strong data-result-count>{events.length}</strong> matching changes on page {currentPage} of
+      {` ${totalPages}`}. {totalEvents} published events in total
+    </p>
+    <button class="text-button" type="button" data-download-filtered>Download filtered page CSV</button>
+  </div>
+  <p class="page-filter-note">Filters and the filtered CSV apply to this page.</p>
+
+  <div class="change-grid" data-change-grid>
+    {events.map((event) => <ChangeCard event={event} />)}
+  </div>
+  <div class="empty-state" data-empty hidden>
+    <span aria-hidden="true">∅</span>
+    <h3>No changes match those filters</h3>
+    <p>Try a broader search or clear the filters.</p>
+  </div>
+
+  <nav class="change-pagination" aria-label="Change feed pages">
+    <div>
+      {currentPage > 2 && <a href={pageHref(1)}>First</a>}
+      {currentPage > 1
+        ? <a href={pageHref(currentPage - 1)} rel="prev">← Previous</a>
+        : <span aria-disabled="true">← Previous</span>}
+    </div>
+    <p><strong>Page {currentPage}</strong> of {totalPages}</p>
+    <div>
+      {currentPage < totalPages
+        ? <a href={pageHref(currentPage + 1)} rel="next">Next →</a>
+        : <span aria-disabled="true">Next →</span>}
+      {currentPage < totalPages - 1 && <a href={pageHref(totalPages)}>Last</a>}
+    </div>
+  </nav>
+</section>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>("[data-filters]");
+  const cards = Array.from(document.querySelectorAll<HTMLElement>("[data-event]"));
+  const count = document.querySelector<HTMLElement>("[data-result-count]");
+  const empty = document.querySelector<HTMLElement>("[data-empty]");
+  const download = document.querySelector<HTMLButtonElement>("[data-download-filtered]");
+  const feed = document.querySelector<HTMLElement>("[data-current-page]");
+
+  const applyFilters = () => {
+    if (!form) return;
+    const values = new FormData(form);
+    const query = String(values.get("query") ?? "").trim().toLocaleLowerCase("en-AU");
+    const agency = String(values.get("agency") ?? "");
+    const field = String(values.get("field") ?? "");
+    const direction = String(values.get("direction") ?? "");
+    let visible = 0;
+
+    cards.forEach((card) => {
+      const matches =
+        (!query || (card.dataset.search ?? "").includes(query)) &&
+        (!agency || card.dataset.agency === agency) &&
+        (!field || card.dataset.field === field) &&
+        (!direction || card.dataset.direction === direction);
+      card.hidden = !matches;
+      if (matches) visible += 1;
+    });
+
+    if (count) count.textContent = String(visible);
+    if (empty) empty.hidden = visible !== 0;
+    if (download) download.disabled = visible === 0;
+  };
+
+  form?.addEventListener("input", applyFilters);
+  form?.addEventListener("reset", () => window.setTimeout(applyFilters));
+
+  download?.addEventListener("click", () => {
+    const visible = cards.filter((card) => !card.hidden).map((card) => ({
+      contract_id: card.querySelector(".change-card__identity a")?.textContent?.trim() ?? "",
+      agency: card.dataset.agency ?? "",
+      field: card.dataset.field ?? "",
+      direction: card.dataset.direction ?? "",
+      summary: card.querySelector(".change-summary")?.textContent?.trim() ?? ""
+    }));
+    const neutralise = (value: string) => /^[=+\-@\t\r\n]/.test(value) ? `'${value}` : value;
+    const escape = (value: string) => `"${neutralise(value).replaceAll('"', '""')}"`;
+    const rows = ["contract_id,agency,field,direction,summary", ...visible.map((row) =>
+      [row.contract_id, row.agency, row.field, row.direction, row.summary].map(escape).join(",")
+    )];
+    const blob = new Blob([`${rows.join("\n")}\n`], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `contractdelta-changes-page-${feed?.dataset.currentPage ?? "1"}.csv`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  });
+</script>

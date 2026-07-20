@@ -279,6 +279,7 @@ select {
 
 .hero__signal {
   position: relative;
+  container-type: inline-size;
   min-height: 430px;
   padding: clamp(2rem, 5vw, 3rem);
   overflow: hidden;
@@ -322,10 +323,12 @@ select {
   display: block;
   position: relative;
   font-family: var(--serif);
-  font-size: clamp(2.5rem, 5vw, 4.4rem);
+  font-size: clamp(1.65rem, 2.8vw, 2.85rem);
+  font-size: clamp(1.65rem, 9cqw, 2.85rem);
   font-weight: 400;
   letter-spacing: -0.05em;
   line-height: 1;
+  white-space: nowrap;
 }
 
 .signal-delta {
@@ -561,6 +564,56 @@ select {
 
 .result-line strong {
   color: var(--ink);
+}
+
+.page-filter-note {
+  margin: -0.65rem 0 1.25rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.change-pagination {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 2.5rem;
+  padding: 1.25rem;
+  border: 1px solid var(--line);
+  background: var(--warm-white);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.change-pagination > div {
+  display: flex;
+  gap: 1rem;
+}
+
+.change-pagination > div:last-child {
+  justify-content: flex-end;
+}
+
+.change-pagination a {
+  font-weight: 800;
+  text-decoration-color: var(--acid);
+  text-decoration-thickness: 2px;
+}
+
+.change-pagination span[aria-disabled="true"] {
+  color: var(--muted);
+  opacity: 0.55;
+}
+
+.change-pagination p {
+  margin: 0;
+  text-align: center;
+}
+
+.change-page-hero + .changes-section {
+  padding-top: 6rem;
 }
 
 .change-grid {
@@ -1896,6 +1949,28 @@ tbody th {
 
   .filters {
     grid-template-columns: 1fr;
+  }
+
+  .result-line {
+    display: block;
+  }
+
+  .result-line .text-button {
+    margin-top: 0.6rem;
+    padding: 0;
+  }
+
+  .change-pagination {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .change-pagination > p {
+    grid-row: 1;
+    grid-column: 1 / -1;
+  }
+
+  .change-pagination > div {
+    flex-wrap: wrap;
   }
 
   .reset-button {
