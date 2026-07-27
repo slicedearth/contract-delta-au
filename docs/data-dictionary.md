@@ -12,7 +12,7 @@
 | `source_url` | Machine-readable AusTender OCDS JSON endpoint for the Contract Notice |
 | `source_hash` | SHA-256 of the privacy-minimised normalised contract fields |
 | `agency_name` | Source party with the `procuringEntity` role |
-| `supplier_name` | Source party with the `supplier` role |
+| `supplier_name` | Source party with the `supplier` role, or `Supplier not reported` when that field contains a contact or address marker |
 | `reported_value` | Maximum contract-life value reported by AusTender, normally AUD |
 | `contract_start_date` | Source contract start date on the Canberra calendar |
 | `contract_end_date` | Source contract end date on the Canberra calendar |
@@ -39,6 +39,10 @@
 
 Contact names, phone numbers, email addresses, ABNs, street addresses, and postal addresses are
 not required for contract-change analysis and are not retained.
+
+The source manifest records `supplier_names_redacted`, the number of release versions whose
+supplier field was replaced during the latest run. Redacted placeholders appear on the
+affected contract but are excluded from supplier summaries.
 
 ## Collection coverage
 

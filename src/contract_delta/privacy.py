@@ -32,6 +32,8 @@ PATTERNS = {
     ),
 }
 
+REDACTED_SUPPLIER_NAME = "Supplier not reported"
+
 
 @dataclass(frozen=True, slots=True)
 class PrivacyFinding:
@@ -39,6 +41,14 @@ class PrivacyFinding:
 
     field_name: str
     marker: str
+
+
+def sanitise_supplier_name(value: str) -> str:
+    """Replace a supplier field that contains a contact or address marker."""
+
+    if any(pattern.search(value) for pattern in PATTERNS.values()):
+        return REDACTED_SUPPLIER_NAME
+    return value
 
 
 def privacy_findings(version: ContractVersion) -> tuple[PrivacyFinding, ...]:

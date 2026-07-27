@@ -30,7 +30,7 @@ from contract_delta.normalize import (
     official_record_url,
     version_sort_key,
 )
-from contract_delta.privacy import privacy_findings
+from contract_delta.privacy import REDACTED_SUPPLIER_NAME, privacy_findings
 
 SOURCE_LICENSE = "https://creativecommons.org/licenses/by/3.0/au/"
 SOURCE_PUBLISHER = "Australian Government Department of Finance"
@@ -335,16 +335,20 @@ def build_site_data(
                 "reported_value": Decimal("0"),
             },
         )
-        supplier = suppliers.setdefault(
-            contract["supplier_name"],
-            {
-                "name": contract["supplier_name"],
-                "contracts": 0,
-                "events": 0,
-                "reported_value": Decimal("0"),
-            },
-        )
-        for summary in (agency, supplier):
+        summaries = [agency]
+        if contract["supplier_name"] != REDACTED_SUPPLIER_NAME:
+            summaries.append(
+                suppliers.setdefault(
+                    contract["supplier_name"],
+                    {
+                        "name": contract["supplier_name"],
+                        "contracts": 0,
+                        "events": 0,
+                        "reported_value": Decimal("0"),
+                    },
+                )
+            )
+        for summary in summaries:
             summary["contracts"] += 1
             summary["events"] += len(contract["events"])
             summary["reported_value"] += value
@@ -471,9 +475,12 @@ def process_releases(
 
     versions: list[ContractVersion] = []
     failures: list[dict[str, Any]] = []
+    supplier_names_redacted = 0
     for release in [*unique_releases.values(), *anonymous_releases]:
         try:
             version = normalise_release(release)
+            if version.supplier_name == REDACTED_SUPPLIER_NAME:
+                supplier_names_redacted += 1
             findings = privacy_findings(version)
             if findings:
                 fields = ", ".join(sorted({finding.field_name for finding in findings}))
@@ -597,6 +604,7 @@ def process_releases(
         latest_source_modified_at=latest_modified,
         state_sha256=hashlib.sha256(state_bytes).hexdigest(),
         events_sha256=hashlib.sha256(events_bytes).hexdigest(),
+        supplier_names_redacted=supplier_names_redacted,
     )
     _write_json(manifest_path, manifest.model_dump(mode="json"))
     return PipelineResult(
@@ -607,6 +615,7 @@ def process_releases(
         events_total=len(events),
         validation_failures=len(failures),
         manifest_path=str(manifest_path),
+        supplier_names_redacted=supplier_names_redacted,
     )
 
 
