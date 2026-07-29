@@ -13,6 +13,7 @@ from contract_delta.pipeline import (
     process_releases,
     write_public_status,
 )
+from contract_delta.privacy import REDACTED_SUPPLIER_NAME
 
 
 def test_pipeline_builds_idempotent_evidence_assets(
@@ -166,33 +167,80 @@ def test_source_publisher_change_stops_publication(
 
 
 @pytest.mark.parametrize(
-    ("field_name", "value"),
+    "value",
     [
-        ("description", "Contact records@example.net for the service."),
-        ("description", "Delivery to 42 Example Street, Canberra."),
-        ("description", "Call 02 1234 5678 for details."),
-        ("supplier_name", "Example Supplier ABN 12 345 678 901"),
+        "Contact records@example.net for the service.",
+        "Delivery to 42 Example Street, Canberra.",
+        "Call 02 1234 5678 for details.",
     ],
 )
-def test_privacy_markers_stop_publication(
+def test_non_supplier_privacy_markers_stop_publication(
     tmp_path: Path,
     fixture_releases: list[dict],
-    field_name: str,
     value: str,
 ) -> None:
     release = deepcopy(fixture_releases[0])
-    if field_name == "description":
-        release["contracts"][0]["description"] = value
-    else:
-        supplier = next(
-            party for party in release["parties"] if "supplier" in party.get("roles", [])
-        )
-        supplier["name"] = value
+    release["contracts"][0]["description"] = value
 
     with pytest.raises(DataQualityError, match="privacy scan"):
         process_releases([release], root=tmp_path)
 
     assert not (tmp_path / "data/state/current-contracts.json").exists()
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        "Contact records@example.net",
+        "Example Supplier ABN 12 345 678 901",
+        "Call 02 1234 5678",
+        "42 Example Street",
+    ],
+)
+def test_supplier_privacy_markers_are_redacted(
+    tmp_path: Path,
+    fixture_releases: list[dict],
+    value: str,
+) -> None:
+    release = deepcopy(fixture_releases[0])
+    supplier = next(
+        party for party in release["parties"] if "supplier" in party.get("roles", [])
+    )
+    supplier["name"] = value
+
+    result = process_releases([release], root=tmp_path)
+    contract_id = release["contracts"][0]["id"]
+    state = json.loads(
+        (tmp_path / "data/state/current-contracts.json").read_text(encoding="utf-8")
+    )
+    manifest = json.loads(
+        (tmp_path / "data/manifests/source-manifest.json").read_text(encoding="utf-8")
+    )
+
+    assert state[contract_id]["versions"][0]["supplier_name"] == REDACTED_SUPPLIER_NAME
+    assert value not in json.dumps(state)
+    assert result.supplier_names_redacted == 1
+    assert manifest["supplier_names_redacted"] == 1
+
+
+def test_redacted_suppliers_are_excluded_from_supplier_summaries(
+    tmp_path: Path,
+    fixture_releases: list[dict],
+) -> None:
+    releases = deepcopy(fixture_releases[:2])
+    for release in releases:
+        supplier = next(
+            party for party in release["parties"] if "supplier" in party.get("roles", [])
+        )
+        supplier["name"] = "42 Example Street"
+
+    process_releases(releases, root=tmp_path)
+    dashboard = json.loads(
+        (tmp_path / "site/src/data/dashboard.json").read_text(encoding="utf-8")
+    )
+
+    assert dashboard["contracts"][0]["supplier_name"] == REDACTED_SUPPLIER_NAME
+    assert dashboard["suppliers"] == []
 
 
 @pytest.mark.parametrize("value", ["=1+1", "+1", "-1", "@SUM(A1:A2)", "\tvalue"])

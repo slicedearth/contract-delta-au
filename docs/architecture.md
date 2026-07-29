@@ -8,8 +8,8 @@ always-running service.
 1. `AusTenderClient` retrieves latest-modified OCDS release packages, follows same-origin
    cursor links, ranks explicit amendment contracts deterministically, and hydrates parent
    history for a bounded selected set.
-2. `normalise_release` reduces each source release to analysis fields and removes contact and
-   address data.
+2. `normalise_release` reduces each source release to analysis fields, replaces supplier
+   fields containing contact or address markers, and excludes other unnecessary personal data.
 3. `compare_versions` is a pure function that creates deterministic field-level events.
 4. `process_releases` merges validated versions in a private data checkout without allowing old
    releases to roll current state backwards.

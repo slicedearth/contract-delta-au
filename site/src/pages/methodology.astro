@@ -68,7 +68,8 @@ const base = import.meta.env.BASE_URL;
           <li>Source modification timestamps remain in UTC.</li>
           <li>Whitespace, empty values, and HTML entities are normalised.</li>
           <li>Explicit `-A#` identifiers define amendment order.</li>
-          <li>Contact details, ABNs, and addresses are discarded.</li>
+          <li>Supplier fields containing contact details, ABNs, or addresses use <code>Supplier not reported</code>.</li>
+          <li>Matching content in other retained fields stops publication.</li>
         </ul>
       </section>
       <section id="comparison">

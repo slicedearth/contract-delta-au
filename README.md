@@ -57,8 +57,9 @@ and contract-ID tie-breakers to retain a bounded set. Each selected contract's p
 is fetched so a new repository can calculate the real before value. The dashboard publishes
 the latest discovered, selected, and skipped counts. This coverage is intentionally not
 exhaustive. Contacts, email addresses, ABNs, and street addresses are deliberately excluded.
-High-confidence contact, business-identifier, phone-number, and street-address patterns stop
-publication before data can enter private history or a deployment artifact.
+Supplier fields containing those markers are replaced with `Supplier not reported`.
+High-confidence matches in other retained fields stop publication before data can enter private
+history or a deployment artifact.
 
 Full state, events, manifests, and checkpoints live in a separate private repository. The
 public repository retains source code, privacy-minimised fixtures, and non-identifying update

@@ -12,6 +12,7 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from contract_delta.models import ContractVersion
+from contract_delta.privacy import sanitise_supplier_name
 
 AUSTENDER_API = "https://api.tenders.gov.au"
 AUSTENDER_WEB = "https://www.tenders.gov.au"
@@ -158,7 +159,7 @@ def normalise_release(release: dict[str, Any]) -> ContractVersion:
             awards[0].get("id") if awards else None,
         ),
         "agency_name": _party_name(release, "procuringEntity"),
-        "supplier_name": _party_name(release, "supplier"),
+        "supplier_name": sanitise_supplier_name(_party_name(release, "supplier")),
         "title": clean_text(contract.get("title")),
         "description": clean_text(contract.get("description"), required=True),
         "category_code": clean_text(classification.get("id")),
