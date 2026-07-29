@@ -43,8 +43,9 @@ timestamp and release ID provide deterministic tie-breakers.
 - empty values become null
 - party letter case is preserved
 - only the primary contract and primary UNSPSC classification are analysed
-- retained text is checked for high-confidence email, labelled business-identifier, Australian
-  phone-number, and street-address patterns before publication
+- supplier fields containing high-confidence email, labelled business-identifier, Australian
+  phone-number, or street-address patterns become `Supplier not reported`
+- the same patterns in other retained fields stop publication
 
 Formatting-only changes do not produce events. Null-to-value and value-to-null transitions do.
 

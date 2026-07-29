@@ -38,9 +38,10 @@ reasonable expectations.
 ContractDelta retains agency and supplier names because they are necessary to analyse public
 contracts. A supplier name can identify a sole trader or other individual. The pipeline
 therefore excludes contact names, phone numbers, email addresses, ABNs, and street and postal
-addresses, and it does not enrich records with data from other sources. A fail-closed scan
-also prevents high-confidence contact, labelled business-identifier, phone-number, and
-street-address patterns from entering durable state or a deployment artifact.
+addresses, and it does not enrich records with data from other sources. Supplier fields
+containing high-confidence contact or address markers are replaced with
+`Supplier not reported`. Matches in other retained fields remain fail-closed and cannot enter
+durable state or a deployment artifact.
 
 Full state and history remain in a private repository. Public deployment artifacts still make
 the selected contract facts available to site visitors, so repository separation is a
