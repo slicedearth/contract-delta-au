@@ -151,8 +151,9 @@ docs/                     architecture, methodology, ethics, and data definition
 
 The sibling private checkout contains `data/state/`, `data/events/`, and `data/manifests/`.
 `site/src/data/update-status.json` is the only production update record retained publicly; it
-contains counts, timestamps, coverage boundaries, and the corresponding private revision, but
-no contract, supplier, agency, description, or source-record content.
+contains counts, timestamps, coverage boundaries, non-identifying privacy-redaction totals,
+and the corresponding private revision, but no contract, supplier, agency, description, or
+source-record content.
 
 ## Automation and cost
 

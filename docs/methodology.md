@@ -45,7 +45,8 @@ timestamp and release ID provide deterministic tie-breakers.
 - only the primary contract and primary UNSPSC classification are analysed
 - supplier fields containing high-confidence email, labelled business-identifier, Australian
   phone-number, or street-address patterns become `Supplier not reported`
-- the same patterns in other retained fields stop publication
+- descriptions containing the same patterns become `Contract description not published`
+- the same patterns in agency, title, and procurement-method fields stop publication
 
 Formatting-only changes do not produce events. Null-to-value and value-to-null transitions do.
 

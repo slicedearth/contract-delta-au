@@ -16,8 +16,8 @@ Static JSON, CSV, and evidence bundles are generated inside the deployment runne
 committed here.
 
 The public `site/src/data/update-status.json` file records only retrieval timestamps, counts,
-coverage boundaries, and the corresponding private revision. It contains no contract,
-supplier, agency, description, or source-record content.
+coverage boundaries, non-identifying privacy-redaction totals, and the corresponding private
+revision. It contains no contract, supplier, agency, description, or source-record content.
 
 The source-derived data remains subject to CC BY 3.0 AU and is not covered by the repository's
 MIT Licence. Preserve the attribution, licence link, adaptation notice, and primary record

@@ -141,6 +141,7 @@ class SourceManifest(BaseModel):
     state_sha256: str
     events_sha256: str
     supplier_names_redacted: int = Field(default=0, ge=0)
+    descriptions_redacted: int = Field(default=0, ge=0)
 
 
 class PipelineResult(BaseModel):
@@ -156,6 +157,7 @@ class PipelineResult(BaseModel):
     validation_failures: int
     manifest_path: str
     supplier_names_redacted: int = Field(default=0, ge=0)
+    descriptions_redacted: int = Field(default=0, ge=0)
 
 
 class BackfillCheckpoint(BaseModel):

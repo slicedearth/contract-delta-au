@@ -13,7 +13,7 @@ from contract_delta.pipeline import (
     process_releases,
     write_public_status,
 )
-from contract_delta.privacy import REDACTED_SUPPLIER_NAME
+from contract_delta.privacy import REDACTED_DESCRIPTION, REDACTED_SUPPLIER_NAME
 
 
 def test_pipeline_builds_idempotent_evidence_assets(
@@ -132,6 +132,10 @@ def test_pipeline_separates_private_state_from_public_build_outputs(
     assert (public_root / "site/src/data/update-status.json").exists()
     assert status["data_revision"] == "abc123"
     assert status["contracts_in_private_state"] == 4
+    assert status["privacy_redactions"] == {
+        "descriptions": 0,
+        "supplier_names": 0,
+    }
 
 
 def test_quality_threshold_stops_publication(tmp_path: Path) -> None:
@@ -170,17 +174,84 @@ def test_source_publisher_change_stops_publication(
     "value",
     [
         "Contact records@example.net for the service.",
+        "Supplier ABN 12 345 678 901 appears in the description.",
         "Delivery to 42 Example Street, Canberra.",
         "Call 02 1234 5678 for details.",
     ],
 )
-def test_non_supplier_privacy_markers_stop_publication(
+def test_description_privacy_markers_are_redacted(
     tmp_path: Path,
     fixture_releases: list[dict],
     value: str,
 ) -> None:
+    releases = deepcopy(fixture_releases[:2])
+    releases[1]["contracts"][0]["description"] = value
+
+    result = process_releases(releases, root=tmp_path)
+    contract_id = releases[1]["contracts"][0]["id"]
+    state = json.loads(
+        (tmp_path / "data/state/current-contracts.json").read_text(encoding="utf-8")
+    )
+    events = json.loads(
+        (tmp_path / "data/events/change-events.json").read_text(encoding="utf-8")
+    )
+    manifest = json.loads(
+        (tmp_path / "data/manifests/source-manifest.json").read_text(encoding="utf-8")
+    )
+    dashboard = json.loads(
+        (tmp_path / "site/src/data/dashboard.json").read_text(encoding="utf-8")
+    )
+    public_events = json.loads(
+        (tmp_path / "site/public/data/change-events.json").read_text(encoding="utf-8")
+    )
+    evidence = json.loads(
+        (tmp_path / f"site/public/evidence/{contract_id}.json").read_text(encoding="utf-8")
+    )
+    csv_text = (tmp_path / "site/public/data/change-events.csv").read_text(encoding="utf-8")
+    public_status = write_public_status(tmp_path, data_revision="privacy-test")
+
+    assert state[contract_id]["versions"][-1]["description"] == REDACTED_DESCRIPTION
+    assert result.descriptions_redacted == 1
+    assert manifest["descriptions_redacted"] == 1
+    assert public_status["privacy_redactions"]["descriptions"] == 1
+    description_events = [event for event in events if event["field_name"] == "description"]
+    assert len(description_events) == 1
+    assert description_events[0]["new_value"] == REDACTED_DESCRIPTION
+    retained_output = json.dumps(
+        {
+            "state": state,
+            "events": events,
+            "manifest": manifest,
+            "dashboard": dashboard,
+            "public_events": public_events,
+            "evidence": evidence,
+            "csv": csv_text,
+            "status": public_status,
+        },
+        default=str,
+    )
+    assert value not in retained_output
+
+
+@pytest.mark.parametrize("field", ["agency_name", "title", "procurement_method"])
+def test_other_retained_field_privacy_markers_stop_publication(
+    tmp_path: Path,
+    fixture_releases: list[dict],
+    field: str,
+) -> None:
     release = deepcopy(fixture_releases[0])
-    release["contracts"][0]["description"] = value
+    value = "Contact records@example.net"
+    if field == "agency_name":
+        agency = next(
+            party
+            for party in release["parties"]
+            if "procuringEntity" in party.get("roles", [])
+        )
+        agency["name"] = value
+    elif field == "title":
+        release["contracts"][0]["title"] = value
+    else:
+        release["tender"]["procurementMethodDetails"] = value
 
     with pytest.raises(DataQualityError, match="privacy scan"):
         process_releases([release], root=tmp_path)

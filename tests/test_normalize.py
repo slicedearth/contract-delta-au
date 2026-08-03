@@ -14,6 +14,7 @@ from contract_delta.normalize import (
     official_record_url,
     parse_amount,
 )
+from contract_delta.privacy import REDACTED_DESCRIPTION
 
 
 def test_normalise_release_uses_canberra_contract_dates(fixture_releases: list[dict]) -> None:
@@ -73,3 +74,14 @@ def test_oversized_source_text_is_rejected(fixture_releases: list[dict]) -> None
 
     with pytest.raises(ValidationError, match="description"):
         normalise_release(release)
+
+
+def test_description_is_redacted_before_hashing(fixture_releases: list[dict]) -> None:
+    release = deepcopy(fixture_releases[0])
+    source_description = "Delivery to 42 Example Street, Canberra."
+    release["contracts"][0]["description"] = source_description
+
+    version = normalise_release(release)
+
+    assert version.description == REDACTED_DESCRIPTION
+    assert source_description not in version.model_dump_json()
