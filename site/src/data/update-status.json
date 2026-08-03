@@ -1,18 +1,22 @@
 {
-  "change_events_in_private_state": 1645,
-  "contracts_in_private_state": 141,
+  "change_events_in_private_state": 1784,
+  "contracts_in_private_state": 155,
   "coverage": {
-    "amended_contracts_discovered": 1123,
+    "amended_contracts_discovered": 950,
     "amended_contracts_selected": 20,
-    "amended_contracts_skipped": 1103,
+    "amended_contracts_skipped": 930,
     "max_amended_contracts": 20,
     "mode": "bounded_amendments",
-    "query_end": "2026-07-27T23:59:59.999999Z",
-    "query_start": "2026-07-19T00:00:00Z",
+    "query_end": "2026-08-03T23:59:59.999999Z",
+    "query_start": "2026-07-26T00:00:00Z",
     "selection_method": "Explicit amendment contracts were ranked by current reported value, then source modification time and contract ID. Only the highest-ranked bounded set was processed."
   },
-  "data_revision": "d693df80c92f65493c012ad3b8fc1e78df855397",
-  "latest_source_modified_at": "2026-07-24T06:06:43Z",
-  "retrieved_at": "2026-07-27T15:12:46.916186Z",
-  "schema_version": "1.0"
+  "data_revision": "ee2d31de5d4f6d1cee83e6330a3c8be242fdef71",
+  "latest_source_modified_at": "2026-07-31T04:07:58Z",
+  "privacy_redactions": {
+    "descriptions": 2,
+    "supplier_names": 0
+  },
+  "retrieved_at": "2026-08-03T07:16:45.979891Z",
+  "schema_version": "1.1"
 }
