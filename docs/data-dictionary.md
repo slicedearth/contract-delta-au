@@ -13,6 +13,7 @@
 | `source_hash` | SHA-256 of the privacy-minimised normalised contract fields |
 | `agency_name` | Source party with the `procuringEntity` role |
 | `supplier_name` | Source party with the `supplier` role, or `Supplier not reported` when that field contains a contact or address marker |
+| `description` | Source contract description, or `Contract description not published` when that field contains a contact or address marker |
 | `reported_value` | Maximum contract-life value reported by AusTender, normally AUD |
 | `contract_start_date` | Source contract start date on the Canberra calendar |
 | `contract_end_date` | Source contract end date on the Canberra calendar |
@@ -40,9 +41,10 @@
 Contact names, phone numbers, email addresses, ABNs, street addresses, and postal addresses are
 not required for contract-change analysis and are not retained.
 
-The source manifest records `supplier_names_redacted`, the number of release versions whose
-supplier field was replaced during the latest run. Redacted placeholders appear on the
-affected contract but are excluded from supplier summaries.
+The source manifest records `supplier_names_redacted` and `descriptions_redacted`, the numbers
+of release versions whose supplier or description field was replaced during the latest run.
+Supplier placeholders appear on the affected contract but are excluded from supplier
+summaries. Description placeholders state that the source text was not retained or published.
 
 ## Collection coverage
 
@@ -64,6 +66,7 @@ range.
 
 `site/src/data/update-status.json` is the only production update record committed to the public
 repository. It contains retrieval and latest-source timestamps, private-state contract and
-event counts, collection coverage, and the corresponding private revision. It deliberately
+event counts, collection coverage, non-identifying privacy-redaction counts, and the
+corresponding private revision. It deliberately
 excludes contract IDs, notice IDs, agency names, supplier names, descriptions, values, source
 URLs, release IDs, and evidence hashes.

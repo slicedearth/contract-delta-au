@@ -33,6 +33,7 @@ PATTERNS = {
 }
 
 REDACTED_SUPPLIER_NAME = "Supplier not reported"
+REDACTED_DESCRIPTION = "Contract description not published"
 
 
 @dataclass(frozen=True, slots=True)
@@ -43,11 +44,23 @@ class PrivacyFinding:
     marker: str
 
 
+def _contains_privacy_marker(value: str) -> bool:
+    return any(pattern.search(value) for pattern in PATTERNS.values())
+
+
 def sanitise_supplier_name(value: str) -> str:
     """Replace a supplier field that contains a contact or address marker."""
 
-    if any(pattern.search(value) for pattern in PATTERNS.values()):
+    if _contains_privacy_marker(value):
         return REDACTED_SUPPLIER_NAME
+    return value
+
+
+def sanitise_description(value: str) -> str:
+    """Replace a description that contains a contact or address marker."""
+
+    if _contains_privacy_marker(value):
+        return REDACTED_DESCRIPTION
     return value
 
 

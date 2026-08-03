@@ -12,7 +12,7 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from contract_delta.models import ContractVersion
-from contract_delta.privacy import sanitise_supplier_name
+from contract_delta.privacy import sanitise_description, sanitise_supplier_name
 
 AUSTENDER_API = "https://api.tenders.gov.au"
 AUSTENDER_WEB = "https://www.tenders.gov.au"
@@ -145,6 +145,8 @@ def normalise_release(release: dict[str, Any]) -> ContractVersion:
     classification = (items[0].get("classification") or {}) if items else {}
     awards = release.get("awards") or []
     tender = release.get("tender") or {}
+    description = clean_text(contract.get("description"), required=True)
+    assert description is not None
 
     fields: dict[str, Any] = {
         "contract_id": contract_id,
@@ -161,7 +163,7 @@ def normalise_release(release: dict[str, Any]) -> ContractVersion:
         "agency_name": _party_name(release, "procuringEntity"),
         "supplier_name": sanitise_supplier_name(_party_name(release, "supplier")),
         "title": clean_text(contract.get("title")),
-        "description": clean_text(contract.get("description"), required=True),
+        "description": sanitise_description(description),
         "category_code": clean_text(classification.get("id")),
         "procurement_method": clean_text(tender.get("procurementMethodDetails"))
         or clean_text(tender.get("procurementMethod")),

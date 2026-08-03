@@ -30,7 +30,11 @@ from contract_delta.normalize import (
     official_record_url,
     version_sort_key,
 )
-from contract_delta.privacy import REDACTED_SUPPLIER_NAME, privacy_findings
+from contract_delta.privacy import (
+    REDACTED_DESCRIPTION,
+    REDACTED_SUPPLIER_NAME,
+    privacy_findings,
+)
 
 SOURCE_LICENSE = "https://creativecommons.org/licenses/by/3.0/au/"
 SOURCE_PUBLISHER = "Australian Government Department of Finance"
@@ -476,11 +480,14 @@ def process_releases(
     versions: list[ContractVersion] = []
     failures: list[dict[str, Any]] = []
     supplier_names_redacted = 0
+    descriptions_redacted = 0
     for release in [*unique_releases.values(), *anonymous_releases]:
         try:
             version = normalise_release(release)
             if version.supplier_name == REDACTED_SUPPLIER_NAME:
                 supplier_names_redacted += 1
+            if version.description == REDACTED_DESCRIPTION:
+                descriptions_redacted += 1
             findings = privacy_findings(version)
             if findings:
                 fields = ", ".join(sorted({finding.field_name for finding in findings}))
@@ -605,6 +612,7 @@ def process_releases(
         state_sha256=hashlib.sha256(state_bytes).hexdigest(),
         events_sha256=hashlib.sha256(events_bytes).hexdigest(),
         supplier_names_redacted=supplier_names_redacted,
+        descriptions_redacted=descriptions_redacted,
     )
     _write_json(manifest_path, manifest.model_dump(mode="json"))
     return PipelineResult(
@@ -616,6 +624,7 @@ def process_releases(
         validation_failures=len(failures),
         manifest_path=str(manifest_path),
         supplier_names_redacted=supplier_names_redacted,
+        descriptions_redacted=descriptions_redacted,
     )
 
 
@@ -649,12 +658,16 @@ def write_public_status(
     manifest_path = data_root / "data/manifests/source-manifest.json"
     manifest = SourceManifest.model_validate(_load_json(manifest_path, {}))
     status = {
-        "schema_version": "1.0",
+        "schema_version": "1.1",
         "retrieved_at": manifest.retrieved_at,
         "latest_source_modified_at": manifest.latest_source_modified_at,
         "contracts_in_private_state": manifest.contracts_in_state,
         "change_events_in_private_state": manifest.change_events_total,
         "coverage": manifest.coverage.model_dump(mode="json"),
+        "privacy_redactions": {
+            "supplier_names": manifest.supplier_names_redacted,
+            "descriptions": manifest.descriptions_redacted,
+        },
         "data_revision": data_revision,
     }
     _write_json(root / "site/src/data/update-status.json", status)

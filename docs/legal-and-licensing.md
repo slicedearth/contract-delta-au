@@ -40,8 +40,10 @@ contracts. A supplier name can identify a sole trader or other individual. The p
 therefore excludes contact names, phone numbers, email addresses, ABNs, and street and postal
 addresses, and it does not enrich records with data from other sources. Supplier fields
 containing high-confidence contact or address markers are replaced with
-`Supplier not reported`. Matches in other retained fields remain fail-closed and cannot enter
-durable state or a deployment artifact.
+`Supplier not reported`. A description containing the same markers is replaced in full with
+`Contract description not published`. Matches in agency, title, and procurement-method fields
+remain fail-closed and cannot enter durable state or a deployment artifact. The manifest and
+public update status retain only non-identifying redaction counts.
 
 Full state and history remain in a private repository. Public deployment artifacts still make
 the selected contract facts available to site visitors, so repository separation is a
